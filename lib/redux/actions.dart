@@ -1,0 +1,4 @@
+enum Actions {
+  SetMyInfo,
+  SetLanguage
+}
