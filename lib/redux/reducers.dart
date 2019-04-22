@@ -14,5 +14,9 @@ AppState mainReducer(AppState state, dynamic action){
     return state;
   }
 
+  if (action['type'] == Actions.SetStoreUserInfo) {
+    state.storeUserInfo.infos = action['data'];
+  }
+
   return state;
 }
