@@ -4,8 +4,10 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'redux/index.dart';
 import 'apiRequest/index.dart';
+import 'utils/sharedPreferences.dart';
 
 void main() async {
+  await initSharedPreferences();
   final store = await stateInit();
   dioConfig(store); // dio请求配置
   runApp(new MyApp(store: store));//传入store
