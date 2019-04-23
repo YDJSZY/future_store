@@ -25,10 +25,6 @@ class _FutureStore extends State<FutureStore> {
     });
   }
 
-  _getEffective() async {
-    await getEffective();
-  }
-
   @override
   Widget build(BuildContext context) {
     return new StoreConnector<dynamic, int>(
@@ -84,12 +80,6 @@ class _FutureStore extends State<FutureStore> {
                     title: new Text('我的'),
                   ),
                 ]
-              ),
-              floatingActionButton: new FloatingActionButton(
-                    // Attach the `callback` to the `onPressed` attribute
-                onPressed: _getEffective,
-                tooltip: 'Increment',
-                child: new Icon(Icons.add),
               ),
             );
         }

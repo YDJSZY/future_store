@@ -28,6 +28,7 @@ class _Login extends State<Login> {
     if (!validateRes) return;
     Map data = {'email': email, 'password': password};
     var res = await loginApp(data);
+    print(res);
     if (res['ticLogin']['success'] && res['storeLogin']['result'] == 'success') {
       setUserInfo(res['ticLogin']['data'], res['storeLogin']['info']);
     }

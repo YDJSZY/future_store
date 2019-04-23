@@ -25,7 +25,7 @@ dioConfig(store, navigatorKey) {
         }
       }
      // 在请求被发送之前做一些事情
-     return options; //continue
+      return options; //continue
      // 如果你想完成请求并返回一些自定义数据，可以返回一个`Response`对象或返回`dio.resolve(data)`。
      // 这样请求将会被终止，上层then会被调用，then中返回的数据将是你的自定义数据data.
      //
@@ -36,11 +36,16 @@ dioConfig(store, navigatorKey) {
       if (response.statusCode == 401) { // token失效
         navigatorKey.currentState.pushNamed('/login');
       }
-     return response; // continue
+      if (response == null) return {'success': false, 'data': null};
+      return response; // continue
     },
     onError: (DioError e) {
       // 当请求失败时做一些预处理
-     return e;//continue
+      if (e.response?.statusCode == 401) {
+        navigatorKey.currentState.pushNamed('/login');
+        return {'success': false, 'data': '登录失效'};
+      }
+      return e;//continue
     }
   ));
 }
@@ -100,6 +105,17 @@ getEffective() async {
   try {
     Response response = await dio.get(
       '${apiPrefix}api_futureshop/api/v1/rewardPool/effective',
+    );
+    return response.data;
+  } catch (e) {
+    print(e.error);
+  }
+}
+
+receiveReward(bonusId) async {
+  try {
+    Response response = await dio.get(
+      '${apiPrefix}api_futureshop/api/v1/rewardPool/receive/$bonusId',
     );
     return response.data;
   } catch (e) {

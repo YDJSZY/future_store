@@ -17,6 +17,7 @@ List positions = [
   [150, 250],
   [60, 250]
 ];
+
 class Base extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -24,13 +25,17 @@ class Base extends StatefulWidget {
   }
 }
 
-class _Base extends State<Base> with SingleTickerProviderStateMixin {
+class _Base extends State<Base> with TickerProviderStateMixin {
   Map integralAccount = {'balance': ''};
   List tempPositions = positions;
   List rewardList = [];
   List randomNumList = [];
+  double currentEatAmount;
+  int currentEatIndex;
   AnimationController controllerOne;
   Animation<double> animationOne;
+  AnimationController controllerTwo;
+  Animation<double> animationTwo;
 
   @override
   void initState() {
@@ -38,6 +43,7 @@ class _Base extends State<Base> with SingleTickerProviderStateMixin {
     _getIntegralAccount(globalState.state.myInfo.infos['id']);
     _getEffective();
     setAnimationOne();
+    setAnimationTwo();
   }
 
   _getIntegralAccount(userId) async {
@@ -76,6 +82,20 @@ class _Base extends State<Base> with SingleTickerProviderStateMixin {
         setState(() {});
       });
     controllerOne.forward();
+  }
+
+  setAnimationTwo() {
+    controllerTwo = AnimationController(
+      vsync: this, duration: const Duration(milliseconds: 500));
+    // 通过 Tween 对象 创建 Animation 对象
+    animationTwo = Tween(begin: 0.0, end: -150.0).animate(controllerTwo)
+      ..addListener(() {
+        var isCompleted = animationTwo.isCompleted;
+        if (isCompleted) {
+          print('isCompleted');
+          addBalance();
+        }
+      });
   }
 
   Widget buildBalance() {
@@ -151,23 +171,49 @@ class _Base extends State<Base> with SingleTickerProviderStateMixin {
     print(randomNumList);
   }
 
+  eat(amount, index) {
+    currentEatAmount = amount;
+    currentEatIndex = index;
+    controllerTwo.forward();
+  }
+
+  addBalance() {
+    var _rewardList = rewardList;
+    _rewardList[currentEatIndex] = null;
+    setState(() {
+      rewardList = _rewardList;
+    });
+  }
+
   List<Widget> buildReward() {
     tempPositions = positions;
     List<Widget> contentList = [];
     for (var i = 0; i < rewardList.length; i++) {
+      var content;
+      if (rewardList[i] == null) {
+        content = Container();
+        contentList.add(content);
+        continue;
+      }
       var detailPosition = positions[randomNumList[i]];
       var reward = divPrecision(val: rewardList[i]['amount']);
-      var content = Positioned(
+      content = Positioned(
         left: double.parse(detailPosition[0].toString()),
         top: double.parse(detailPosition[1].toString()),
-        child: Column(
-          children: <Widget>[
-            Image.asset('lib/assets/imgs/coin-s.png', width: 40, height: 40),
-            Padding(
-              padding: EdgeInsets.only(top: 4),
-              child: Text(reward.toString(), style: TextStyle(color: Colors.white, fontSize: 8)),
-            )
-          ],
+        child: GestureDetector(
+          onTap: () { eat(reward, i); },
+          child: Transform.translate(
+            offset: Offset(0, animationTwo.value),
+            child: Column(
+              children: <Widget>[
+                Image.asset('lib/assets/imgs/coin-s.png', width: 40, height: 40),
+                Padding(
+                  padding: EdgeInsets.only(top: 4),
+                  child: Text(reward.toString(), style: TextStyle(color: Colors.white, fontSize: 8)),
+                )
+              ],
+            ),
+          )
         ),
       );
       contentList.add(content);
