@@ -16,7 +16,6 @@ class _Authentication extends State<Authentication> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    print(888);
   }
 
   @override
@@ -25,7 +24,6 @@ class _Authentication extends State<Authentication> {
       child: new StoreConnector<dynamic, int>(
         converter: (store) => store.state.myInfo.infos['id'],//转换从redux拿回来的值
         builder: (context, id) {
-          print(id);
           return id == null ? Container() : widget.content;
         },
       ),

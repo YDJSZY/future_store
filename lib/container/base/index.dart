@@ -1,5 +1,22 @@
 import 'package:flutter/material.dart';
+import 'dart:math' show Random;
+import '../../apiRequest/index.dart';
+import '../../redux/index.dart';
+import '../../utils/tools.dart';
 
+List positions = [
+  [0, 0],
+  [50, 10],
+  [100, 8],
+  [160, 20],
+  [210, 30],
+  [260, 10],
+  [140, 130],
+  [80, 140],
+  [200, 200],
+  [150, 250],
+  [60, 250]
+];
 class Base extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -7,21 +24,183 @@ class Base extends StatefulWidget {
   }
 }
 
-class _Base extends State<Base> {
+class _Base extends State<Base> with SingleTickerProviderStateMixin {
+  Map integralAccount = {'balance': ''};
+  List tempPositions = positions;
+  List rewardList = [];
+  List randomNumList = [];
+  AnimationController controllerOne;
+  Animation<double> animationOne;
+
   @override
   void initState() {
     super.initState();
-    print('基地');
+    _getIntegralAccount(globalState.state.myInfo.infos['id']);
+    _getEffective();
+    setAnimationOne();
+  }
+
+  _getIntegralAccount(userId) async {
+    var res = await getIntegralAccount(userId);
+    if (res['success']) {
+      List data = res['data'];
+      var _integralAccount = data.where((item) => item['symbol'] == 'PPTR').toList()[0];
+      _integralAccount['balance'] = divPrecision(val: _integralAccount['balance']);
+      setState(() {
+        integralAccount = _integralAccount;
+      });
+    }
+  }
+
+  _getEffective() async {
+    var res = await getEffective();
+    if (res['success']) {
+      setState(() {
+        rewardList = res['data']['rows'];
+      });
+      getRandomNum(res['data']['count']);
+    }
+  }
+
+  setAnimationOne() {
+    controllerOne = AnimationController(
+      vsync: this, duration: const Duration(milliseconds: 2000));
+    // 通过 Tween 对象 创建 Animation 对象
+    animationOne = Tween(begin: 0.0, end: -20.0).animate(controllerOne)
+      ..addListener(() {
+        if (animationOne.value == -20.0) { // 转完一圈后重置，接着运动
+          controllerOne.reverse();
+        } else if (animationOne.value == 0) {
+          controllerOne.forward();
+        }
+        setState(() {});
+      });
+    controllerOne.forward();
+  }
+
+  Widget buildBalance() {
+    return Container(
+      padding: EdgeInsets.fromLTRB(12, 9, 12, 9),
+      width: 150,
+      decoration: BoxDecoration(
+        color: Color(0xFF1C222F),
+        borderRadius: BorderRadius.all(Radius.circular(13)),
+      ),
+      child: Row(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(right: 12),
+            child: Image.asset('lib/assets/imgs/platform_token_ss.png', width: 16, height: 16,),
+          ),
+          Text(
+            'PPTR',
+            style: TextStyle(color: Colors.white, fontSize: 10),
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 12),
+            child: Text(
+              integralAccount['balance'].toString(),
+              style: TextStyle(color: Colors.white, fontSize: 10)
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget buildEarth() {
+    return Align(
+      alignment: Alignment.center,
+      child: Container(
+        height: 325,
+        width: 323,
+        margin: EdgeInsets.only(top: 40),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('lib/assets/imgs/earth.png'),
+            fit: BoxFit.cover
+          )
+        ),
+        child: Transform.translate(
+          offset: Offset(0, animationOne.value),
+          child: Container(
+            height: 325,
+            width: 323,
+            child: Stack(
+              children: buildReward().toList(),
+            ),
+          ),
+        )
+      ),
+    );
+  }
+
+  getRandomNum(len) {
+    randomNumList = [];
+    generateRandomNum() {
+      var randomNum = Random().nextInt(11);// 随机生成0到11的整数
+      if (randomNumList.contains(randomNum)) {
+        return generateRandomNum();
+      }
+      randomNumList.add(randomNum);
+    }
+    for (var i = 0; i< len; i++) {
+      generateRandomNum();
+    }
+    print(randomNumList);
+  }
+
+  List<Widget> buildReward() {
+    tempPositions = positions;
+    List<Widget> contentList = [];
+    for (var i = 0; i < rewardList.length; i++) {
+      var detailPosition = positions[randomNumList[i]];
+      var reward = divPrecision(val: rewardList[i]['amount']);
+      var content = Positioned(
+        left: double.parse(detailPosition[0].toString()),
+        top: double.parse(detailPosition[1].toString()),
+        child: Column(
+          children: <Widget>[
+            Image.asset('lib/assets/imgs/coin-s.png', width: 40, height: 40),
+            Padding(
+              padding: EdgeInsets.only(top: 4),
+              child: Text(reward.toString(), style: TextStyle(color: Colors.white, fontSize: 8)),
+            )
+          ],
+        ),
+      );
+      contentList.add(content);
+    }
+    return contentList;
+  }
+
+  void dispose() {
+    controllerOne.dispose();
+    super.dispose();
+    print('dispose');
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('lib/assets/imgs/home-bg.gif'),
-          fit: BoxFit.cover
-        )
+    return Scaffold(
+      body: Container(
+        padding: EdgeInsets.only(left: 13, top: 40),
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('lib/assets/imgs/home-bg.gif'),
+            fit: BoxFit.cover
+          )
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            buildBalance(),
+            buildEarth()
+          ],
+        ),
       )
     );
   }

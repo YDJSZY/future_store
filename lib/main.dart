@@ -5,18 +5,21 @@ import 'package:redux/redux.dart';
 import 'redux/index.dart';
 import 'apiRequest/index.dart';
 import 'utils/sharedPreferences.dart';
+import 'pages/account/login/index.dart';
 
 void main() async {
+  final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
   await initSharedPreferences();
   final store = await stateInit();
-  dioConfig(store); // dio请求配置
-  runApp(new MyApp(store: store));//传入store
+  dioConfig(store, navigatorKey); // dio请求配置
+  runApp(new MyApp(store: store, navigatorKey: navigatorKey)); // 传入store
 }
 
 class MyApp extends StatefulWidget {
   // This widget is the root of your application.
   final Store store;
-  MyApp({this.store});
+  final GlobalKey navigatorKey;
+  MyApp({this.store, this.navigatorKey});
   @override
   State<StatefulWidget> createState() {
     return _MyApp();
@@ -24,6 +27,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyApp extends State<MyApp> {
+
   @override
   void initState() {
     super.initState();
@@ -38,7 +42,11 @@ class _MyApp extends State<MyApp> {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: FutureStore()
+        home: FutureStore(),
+        navigatorKey: widget.navigatorKey,
+        routes: <String, WidgetBuilder>{
+          '/login': (BuildContext context) => Login(),
+        },
       )
     );
   }

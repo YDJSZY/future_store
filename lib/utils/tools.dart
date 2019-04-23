@@ -4,3 +4,8 @@ bool isEmail(val) {
   final regRes = exp.hasMatch(val);
   return regRes;
 }
+
+dynamic divPrecision({val, precision}) {
+  var _precision = precision == null ? 1e8 : precision;
+  return int.parse(val) / _precision;
+}

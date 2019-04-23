@@ -21,7 +21,6 @@ class _Store extends State<Store> {
       child: new StoreConnector<dynamic, Map>(
         converter: (store) => store.state.language.data,//转换从redux拿回来的值
         builder: (context, language) {
-          print(language);
           return Text(
             language['username']
           );

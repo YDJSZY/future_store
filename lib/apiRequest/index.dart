@@ -8,7 +8,7 @@ final storeApiPrefix = envApiConfig['store_apiPrefix'];
 final storeSite = envApiConfig['store_site'];
 final appKey = envApiConfig['app_key'];
 
-dioConfig(store) {
+dioConfig(store, navigatorKey) {
   dio.interceptors.add(InterceptorsWrapper(
     onRequest: (RequestOptions options) {
       var ticToken;
@@ -33,7 +33,9 @@ dioConfig(store) {
      // 这样请求将被中止并触发异常，上层catchError会被调用。
     },
     onResponse: (Response response) {
-     // 在返回响应数据之前做一些预处理
+      if (response.statusCode == 401) { // token失效
+        navigatorKey.currentState.pushNamed('/login');
+      }
      return response; // continue
     },
     onError: (DioError e) {
@@ -52,7 +54,7 @@ loginApp(Map data) async {
 loginTic(data) async {
   try {
     Response response = await dio.post(
-      "${apiPrefix}api/v1/login", 
+      '${apiPrefix}api/v1/login', 
       data: data,
       options: Options(
         extra: {'token': false}
@@ -64,11 +66,11 @@ loginTic(data) async {
 }
 
 loginStore(data) async {
-  Map userData = {"user_name": data['email'], "password": data['password']};
+  Map userData = {'user_name': data['email'], 'password': data['password']};
   FormData formData = new FormData.from({
-    "methods": "dsc.user.login.post",
-    "app_key": appKey,
-    "data": json.encode(userData)
+    'methods': 'dsc.user.login.post',
+    'app_key': appKey,
+    'data': json.encode(userData)
   });
   try {
     Response response = await dio.post(
@@ -83,10 +85,21 @@ loginStore(data) async {
   }
 }
 
+getIntegralAccount(userId) async {
+  try {
+    Response response = await dio.get(
+      '${apiPrefix}api_integral/api/v1/integral_account/$userId',
+    );
+    return response.data;
+  } catch (e) {
+    print(e.error);
+  }
+}
+
 getEffective() async {
   try {
     Response response = await dio.get(
-      "${apiPrefix}api_futureshop/api/v1/rewardPool/effective",
+      '${apiPrefix}api_futureshop/api/v1/rewardPool/effective',
     );
     return response.data;
   } catch (e) {

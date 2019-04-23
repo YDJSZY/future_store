@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'init.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import '../redux/actions.dart';
+import '../apiRequest/index.dart';
 import '../pages/account/login/index.dart';
 
 class FutureStore extends StatefulWidget {
@@ -23,6 +23,10 @@ class _FutureStore extends State<FutureStore> {
     setState(() {
       _currentIndex = index;
     });
+  }
+
+  _getEffective() async {
+    await getEffective();
   }
 
   @override
@@ -81,20 +85,11 @@ class _FutureStore extends State<FutureStore> {
                   ),
                 ]
               ),
-              floatingActionButton: new StoreConnector<dynamic, VoidCallback>(
-                converter: (store) {
-                  // Return a `VoidCallback`, which is a fancy name for a function
-                  // with no parameters. It only dispatches an Increment action.
-                  return () => store.dispatch({'type': Actions.SetLanguage, 'data': 'en'});
-                },
-                builder: (context, callback) {
-                  return new FloatingActionButton(
+              floatingActionButton: new FloatingActionButton(
                     // Attach the `callback` to the `onPressed` attribute
-                    onPressed: callback,
-                    tooltip: 'Increment',
-                    child: new Icon(Icons.add),
-                  );
-                },
+                onPressed: _getEffective,
+                tooltip: 'Increment',
+                child: new Icon(Icons.add),
               ),
             );
         }
