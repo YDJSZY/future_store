@@ -143,3 +143,20 @@ getStoreHomeData() async { // 商城首页数据
     print(e.error);
   }
 }
+
+getCategory() async {
+  try {
+    Response response = await dio.get(
+      '$storeSite?m=category',
+      options: Options(
+        extra: {'store': true},
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      )
+    );
+    return response.data;
+  } catch (e) {
+    print(e.error);
+  }
+}

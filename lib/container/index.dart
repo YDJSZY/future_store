@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'init.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import '../apiRequest/index.dart';
 import '../pages/account/login/index.dart';
 
 class FutureStore extends StatefulWidget {
