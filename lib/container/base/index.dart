@@ -3,6 +3,7 @@ import 'dart:math' show Random;
 import '../../apiRequest/index.dart';
 import '../../redux/index.dart';
 import '../../utils/tools.dart';
+import '../../components/toast/index.dart';
 
 List positions = [
   [0, 0],
@@ -30,7 +31,7 @@ class _Base extends State<Base> with TickerProviderStateMixin {
   List tempPositions = positions;
   List rewardList = [];
   List randomNumList = [];
-  double currentEatAmount;
+  Map currentEatRewrad;
   int currentEatIndex;
   AnimationController controllerOne;
   Animation<double> animationOne;
@@ -40,6 +41,7 @@ class _Base extends State<Base> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    instantiateShowToast();
     _getIntegralAccount(globalState.state.myInfo.infos['id']);
     _getEffective();
     setAnimationOne();
@@ -60,11 +62,13 @@ class _Base extends State<Base> with TickerProviderStateMixin {
 
   _getEffective() async {
     var res = await getEffective();
+    var list = res['data']['rows'];
+    list.add(list[0]);
     if (res['success']) {
       setState(() {
-        rewardList = res['data']['rows'];
+        rewardList = list;
       });
-      getRandomNum(res['data']['count']);
+      getRandomNum(2);
     }
   }
 
@@ -94,6 +98,7 @@ class _Base extends State<Base> with TickerProviderStateMixin {
         if (isCompleted) {
           print('isCompleted');
           addBalance();
+          controllerTwo.reset();
         }
       });
   }
@@ -101,7 +106,7 @@ class _Base extends State<Base> with TickerProviderStateMixin {
   Widget buildBalance() {
     return Container(
       padding: EdgeInsets.fromLTRB(12, 9, 12, 9),
-      width: 150,
+      width: 170,
       decoration: BoxDecoration(
         color: Color(0xFF1C222F),
         borderRadius: BorderRadius.all(Radius.circular(13)),
@@ -165,24 +170,36 @@ class _Base extends State<Base> with TickerProviderStateMixin {
       }
       randomNumList.add(randomNum);
     }
-    for (var i = 0; i< len; i++) {
+    for (var i = 0; i < len; i++) {
       generateRandomNum();
     }
     print(randomNumList);
   }
 
-  eat(amount, index) {
-    currentEatAmount = amount;
+  eat(reward, index) {
+    currentEatRewrad = reward; // 保存当前点击的
     currentEatIndex = index;
-    controllerTwo.forward();
+    addBalance();
+    //controllerTwo.forward();
   }
 
-  addBalance() {
+  addBalance() async {
+    var amount = divPrecision(val: currentEatRewrad['amount']);
+    var res = await receiveReward(currentEatRewrad['id']);
+    if (!res['success']) {
+      return showToast.error('网络错误，请稍后重试');
+    }
+    integralAccount['balance'] += amount; // 增加余额
     var _rewardList = rewardList;
     _rewardList[currentEatIndex] = null;
     setState(() {
       rewardList = _rewardList;
+      integralAccount = integralAccount;
     });
+    var newRewardList = _rewardList.where((item) => item != null).toList();
+    if (newRewardList.length == 0) {
+      _getEffective();
+    }
   }
 
   List<Widget> buildReward() {
@@ -201,9 +218,9 @@ class _Base extends State<Base> with TickerProviderStateMixin {
         left: double.parse(detailPosition[0].toString()),
         top: double.parse(detailPosition[1].toString()),
         child: GestureDetector(
-          onTap: () { eat(reward, i); },
+          onTap: () { eat(rewardList[i], i); },
           child: Transform.translate(
-            offset: Offset(0, animationTwo.value),
+            offset: Offset(0, 0),
             child: Column(
               children: <Widget>[
                 Image.asset('lib/assets/imgs/coin-s.png', width: 40, height: 40),
@@ -224,7 +241,6 @@ class _Base extends State<Base> with TickerProviderStateMixin {
   void dispose() {
     controllerOne.dispose();
     super.dispose();
-    print('dispose');
   }
 
   @override

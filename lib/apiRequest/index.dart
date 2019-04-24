@@ -122,3 +122,24 @@ receiveReward(bonusId) async {
     print(e.error);
   }
 }
+
+getStoreHomeData() async { // 商城首页数据
+  FormData formData = new FormData.from({
+    'id': '3'
+  });
+  try {
+    Response response = await dio.post(
+      '$storeSite?m=console&c=view&a=view',
+      data: formData,
+      options: Options(
+        extra: {'store': true},
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      )
+    );
+    return response.data;
+  } catch (e) {
+    print(e.error);
+  }
+}

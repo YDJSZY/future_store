@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:flutter_redux/flutter_redux.dart';
+import '../../apiRequest/index.dart';
 
 class Store extends StatefulWidget {
   @override
@@ -9,23 +11,36 @@ class Store extends StatefulWidget {
 }
 
 class _Store extends State<Store> {
+  List slideList = [];
   @override
   void initState() {
     super.initState();
-    print('商城');
+    _getStoreHomeData();
+  }
+
+  _getStoreHomeData() async {
+    var res = await getStoreHomeData();
+    var dataList = json.decode(res['view']['data']);
+    var slideData = dataList.where((item) => item['module'] == 'slide').toList();
+    var productData = dataList.where((item) => item['module'] == 'product').toList();
+    setState(() {
+      slideList = slideData['data']['list']; // 轮播图数据
+    });
+    print(slideData);
+    print(productData);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: new StoreConnector<dynamic, Map>(
-        converter: (store) => store.state.language.data,//转换从redux拿回来的值
-        builder: (context, language) {
-          return Text(
-            language['username']
-          );
-        },
-      ),
+    return new StoreConnector<dynamic, Map>(
+      converter: (store) => store.state.language.data,//转换从redux拿回来的值
+      builder: (context, language) {
+        return Scaffold(
+          body: Container(
+            child: Text(language['how_to_deposit']),
+          )
+        );
+      },
     );
   }
 }

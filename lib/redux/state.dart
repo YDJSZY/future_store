@@ -1,5 +1,3 @@
-//import 'dart:convert';
-
 class MyInfo {
   Map infos;
   MyInfo(this.infos);
