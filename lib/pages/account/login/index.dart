@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import '../../../components/toast/index.dart';
 import '../../../redux/actions.dart';
 import '../../../utils/tools.dart';
 import '../../../apiRequest/index.dart';
@@ -20,18 +21,23 @@ class _Login extends State<Login> {
   @override
   void initState() {
     super.initState();
+    instantiateShowToast();
     print('Login');
   }
 
-  void login(setUserInfo) async {
+  void login(setUserInfo, language) async {
     bool validateRes = validate();
-    if (!validateRes) return;
+    if (!validateRes) return null;
     Map data = {'email': email, 'password': password};
     var res = await loginApp(data);
-    print(res);
-    if (res['ticLogin']['success'] && res['storeLogin']['result'] == 'success') {
-      setUserInfo(res['ticLogin']['data'], res['storeLogin']['info']);
+    if (!res['ticLogin']['success']) {
+      return showToast.error(res['ticLogin']['message']);
     }
+    if (res['ticLogin']['success'] && res['storeLogin']['result'] == 'success') {
+      showToast.success('login success');
+      return setUserInfo(res['ticLogin']['data'], res['storeLogin']['info']);
+    }
+    showToast.error(language['network_error']);
   }
 
   bool validate() {
@@ -80,16 +86,16 @@ class _Login extends State<Login> {
                           children: <Widget>[
                             TextField(
                               decoration: InputDecoration(
-                                labelText: '请输入邮箱',
-                                errorText: emailErr ? '邮箱格式错误' : ''
+                                labelText: language['enter_mail_number'],
+                                errorText: emailErr ? language['Wrong_format_mailbox'] : ''
                               ),
                               onChanged: (val) { inputOnChange('email', val);},
                             ),
                             TextField(
                               obscureText: true,
                               decoration: InputDecoration(
-                                labelText: '请输入密码',
-                                errorText: passwordErr ? '请输入密码' : ''
+                                labelText: language['enter_password'],
+                                errorText: passwordErr ? language['enter_password'] : ''
                               ),
                               onChanged: (val) { inputOnChange('password', val);},
                             ),
@@ -111,8 +117,8 @@ class _Login extends State<Login> {
                                         return RaisedButton(
                                           padding: EdgeInsets.only(top: 15, bottom: 15),
                                           color: Color(0xFF70A6FF),
-                                          onPressed: () { login(callback); },
-                                          child: Text('登录', style: TextStyle(color: Colors.white, fontSize: 15),),
+                                          onPressed: () { login(callback, language); },
+                                          child: Text(language['login'], style: TextStyle(color: Colors.white, fontSize: 15),),
                                         );
                                       },
                                     )
@@ -120,7 +126,7 @@ class _Login extends State<Login> {
                                 )
                               ],
                             ),
-                            Text('忘记密码', style: TextStyle(color: Color(0xFF70A6FF), fontSize: 13),)
+                            Text(language['forgot_password'], style: TextStyle(color: Color(0xFF70A6FF), fontSize: 13),)
                           ],
                         ),
                       )
@@ -130,11 +136,11 @@ class _Login extends State<Login> {
                 Container(
                   child: RichText(
                     text: TextSpan(
-                      text: '还没有账号？',
+                      text: '${language['no_account']}？',
                       style: TextStyle(fontSize: 13, color: Color(0xFF434343)),
                       children: <TextSpan>[
                         TextSpan(
-                          text: '注册',
+                          text: language['sign_up'],
                           style: TextStyle(fontSize: 13, color: Color(0xFF70A6FF))
                         )
                       ]

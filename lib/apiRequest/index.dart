@@ -52,6 +52,10 @@ dioConfig(store, navigatorKey) {
 
 loginApp(Map data) async {
   var loginTicRes = await loginTic(data);
+  if (loginTicRes is String) {
+    loginTicRes = json.decode(loginTicRes);
+  }
+  if (!loginTicRes['success']) return {'ticLogin': loginTicRes};
   var loginStoreRes = await loginStore(data);
   return {'ticLogin': loginTicRes, 'storeLogin': loginStoreRes};
 }

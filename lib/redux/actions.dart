@@ -1,5 +1,6 @@
 enum Actions {
   SetMyInfo,
   SetStoreUserInfo,
-  SetLanguage
+  SetLanguage,
+  Logout
 }

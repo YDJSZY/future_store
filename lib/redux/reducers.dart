@@ -22,5 +22,11 @@ AppState mainReducer(AppState state, dynamic action){
     state.storeUserInfo.infos = action['data'];
   }
 
+  if (action['type'] == Actions.Logout) {
+    globalPrefs.setString('userInfo', null);
+    state.myInfo.infos = {};
+    state.storeUserInfo.infos = {};
+  }
+
   return state;
 }
