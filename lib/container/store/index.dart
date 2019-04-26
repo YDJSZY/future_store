@@ -188,7 +188,15 @@ class _Store extends State<Store> {
       width: 166,
       child: Column(
         children: <Widget>[
-          Image.network(img, width: 166, height: 166),
+          Container(
+            height: 166,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(img),
+                fit: BoxFit.fill
+              )
+            ),
+          ),
           Container(
             color: Colors.white,
             padding: EdgeInsets.only(top: 11, left: 12, bottom: 13),
@@ -264,12 +272,16 @@ class _Store extends State<Store> {
                 var img = item['goods_img'];
                 var name = item['title'];
                 var price = item['shop_price'];
-                var content = Container(
-                  margin: EdgeInsets.only(right: 11),
-                  child: buildProduct(img, name, price),
+                var wrap = (i + 1) % 2 == 0;
+                var content = Expanded(
+                  flex: 1,
+                  child: Container(
+                    margin: EdgeInsets.only(right: wrap ? 0 : 11),
+                    child: buildProduct(img, name, price),
+                  ),
                 );
                 temp.add(content);
-                if ((i + 1) % 2 == 0) {
+                if (wrap) {
                   var r = Container(
                     margin: EdgeInsets.only(bottom: 8),
                       child: Row(
