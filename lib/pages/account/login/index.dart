@@ -34,7 +34,6 @@ class _Login extends State<Login> {
       return showToast.error(res['ticLogin']['message']);
     }
     if (res['ticLogin']['success'] && res['storeLogin']['result'] == 'success') {
-      showToast.success('login success');
       return setUserInfo(res['ticLogin']['data'], res['storeLogin']['info']);
     }
     showToast.error(language['network_error']);

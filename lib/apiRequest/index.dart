@@ -148,10 +148,53 @@ getStoreHomeData() async { // 商城首页数据
   }
 }
 
-getCategory() async {
+getCategory(String index) async {
+  FormData formData = new FormData.from({
+    'id': index
+  });
   try {
-    Response response = await dio.get(
-      '$storeSite?m=category',
+    Response response = await dio.post(
+      '$storeSite?m=console&c=view&a=view',
+      data: formData,
+      options: Options(
+        extra: {'store': true},
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      )
+    );
+    return response.data;
+  } catch (e) {
+    print(e.error);
+  }
+}
+
+getCategoryIndex() async {
+  try {
+    Response response = await dio.post(
+      '$storeSite?m=console&c=view&a=default',
+      options: Options(
+        extra: {'store': true},
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      )
+    );
+    return response.data;
+  } catch (e) {
+    print(e.error);
+  }
+}
+
+getProduct(Map data) async {
+  FormData formData = new FormData.from({
+    'number': data['number'],
+    'cat_id': data['cat_id']
+  });
+  try {
+    Response response = await dio.post(
+      '$storeSite?m=console&c=view&a=product',
+      data: formData,
       options: Options(
         extra: {'store': true},
         headers: {
