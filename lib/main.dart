@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; //提供SystemUiOverlayStyle
+import 'dart:io';
 import 'container/index.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -13,6 +15,11 @@ void main() async {
   final store = await stateInit();
   dioConfig(store, navigatorKey); // dio请求配置
   runApp(new MyApp(store: store, navigatorKey: navigatorKey)); // 传入store
+  if (Platform.isAndroid) {
+   // 以下两行 设置android状态栏为透明的沉浸。写在组件渲染之后，是为了在渲染后进行set赋值，覆盖状态栏，写在渲染之前       MaterialApp组件会覆盖掉这个值。
+    SystemUiOverlayStyle systemUiOverlayStyle = SystemUiOverlayStyle(statusBarColor:    Colors.transparent);
+    SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+  }
 }
 
 class MyApp extends StatefulWidget {

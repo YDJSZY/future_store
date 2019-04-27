@@ -240,6 +240,7 @@ class _Base extends State<Base> with TickerProviderStateMixin {
 
   void dispose() {
     controllerOne.dispose();
+    controllerTwo.dispose();
     super.dispose();
   }
 

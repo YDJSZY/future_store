@@ -253,50 +253,56 @@ class _Store extends State<Store> {
   }
 
   Widget buildEcommerceProduct() {
-    return Container(
-      color: Color(0xFFF3F4F6),
-      padding: EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(bottom: 16),
-            child: Text('电商专区', style: TextStyle(color: Color(0xFF313131), fontSize: 15)),
-          ),
-          Column(
-            children: (() {
-              List<Widget> children = [];
-              List<Widget> temp = [];
-              for (var i = 0; i < ecommerceData.length; i++) {
-                var item = ecommerceData[i];
-                var img = item['goods_img'];
-                var name = item['title'];
-                var price = item['shop_price'];
-                var wrap = (i + 1) % 2 == 0;
-                var content = Expanded(
-                  flex: 1,
-                  child: Container(
-                    margin: EdgeInsets.only(right: wrap ? 0 : 11),
-                    child: buildProduct(img, name, price),
-                  ),
-                );
-                temp.add(content);
-                if (wrap) {
-                  var r = Container(
-                    margin: EdgeInsets.only(bottom: 8),
-                      child: Row(
-                      children: temp,
-                    )
-                  );
-                  children.add(r);
-                  temp = [];
-                }
-              }
-              return children;
-            })(),
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Container(
+            color: Color(0xFFF3F4F6),
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(bottom: 16),
+                  child: Text('电商专区', style: TextStyle(color: Color(0xFF313131), fontSize: 15)),
+                ),
+                Column(
+                  children: (() {
+                    List<Widget> children = [];
+                    List<Widget> temp = [];
+                    for (var i = 0; i < ecommerceData.length; i++) {
+                      var item = ecommerceData[i];
+                      var img = item['goods_img'];
+                      var name = item['title'];
+                      var price = item['shop_price'];
+                      var wrap = (i + 1) % 2 == 0;
+                      var content = Expanded(
+                        flex: 1,
+                        child: Container(
+                          margin: EdgeInsets.only(right: wrap ? 0 : 11),
+                          child: buildProduct(img, name, price),
+                        ),
+                      );
+                      temp.add(content);
+                      if (wrap) {
+                        var r = Container(
+                          margin: EdgeInsets.only(bottom: 8),
+                            child: Row(
+                            children: temp,
+                          )
+                        );
+                        children.add(r);
+                        temp = [];
+                      }
+                    }
+                    return children;
+                  })(),
+                )
+              ]
+            )
           )
-        ]
-      )
+        )
+      ],
     );
   }
 

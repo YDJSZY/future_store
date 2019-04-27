@@ -7,6 +7,7 @@ final apiPrefix = envApiConfig['apiPrefix'];
 final storeApiPrefix = envApiConfig['store_apiPrefix'];
 final storeSite = envApiConfig['store_site'];
 final appKey = envApiConfig['app_key'];
+final priceRateIsLocal = envApiConfig['price_rate_isLocal'];
 
 dioConfig(store, navigatorKey) {
   dio.interceptors.add(InterceptorsWrapper(
@@ -205,5 +206,19 @@ getProduct(Map data) async {
     return response.data;
   } catch (e) {
     print(e.error);
+  }
+}
+
+getPricingRate(Map<dynamic, dynamic> params) async { // 计价方式
+  params['local'] = priceRateIsLocal.toString();
+  try {
+    Response response = await dio.get(
+      '${apiPrefix}api_kline/api/v1/kline/token/pptr',
+      queryParameters: params,
+    );
+    if (response.data['success']) return response.data['data']['price'];
+    return 0;
+  } catch (e) {
+    print(e);
   }
 }
