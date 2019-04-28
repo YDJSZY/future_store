@@ -4,6 +4,7 @@ import '../../redux/index.dart';
 import '../../redux/actions.dart';
 import 'myAssets/index.dart';
 import 'myOrderService/index.dart';
+import '../../pages/setting/index.dart';
 
 class My extends StatefulWidget {
   @override
@@ -20,6 +21,13 @@ class _My extends State<My> {
 
   logout() {
     globalState.dispatch({'type': Actions.Logout});
+  }
+
+  gotoSetting() {
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => Setting())
+    );
   }
 
   @override
@@ -56,13 +64,16 @@ class _My extends State<My> {
                               color: Colors.white,
                               size: 26,
                             ),
-                            Icon(
-                              IconData(
-                                0xe6b2, 
-                                fontFamily: 'iconfont'
-                              ),
-                              color: Colors.white,
-                              size: 26,
+                            GestureDetector(
+                              onTap: gotoSetting,
+                              child: Icon(
+                                IconData(
+                                  0xe6b2, 
+                                  fontFamily: 'iconfont'
+                                ),
+                                color: Colors.white,
+                                size: 26,
+                              )
                             )
                           ],
                         ),

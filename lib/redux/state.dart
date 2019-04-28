@@ -13,6 +13,11 @@ class Language {
   Language(this.data);
 }
 
+class Locale {
+  String locale;
+  Locale(this.locale);
+}
+
 class PricingType {
   String type;
   PricingType(this.type);
@@ -23,11 +28,13 @@ class AppState {
   StoreUserInfo storeUserInfo;
   Language language;
   PricingType pricingType;
+  Locale locale;
 
   AppState({
     this.myInfo,
     this.storeUserInfo,
     this.language,
-    this.pricingType
+    this.pricingType,
+    this.locale
   });
 }

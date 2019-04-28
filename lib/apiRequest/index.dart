@@ -25,6 +25,28 @@ dioConfig(store, navigatorKey) {
           options.headers['Authorization'] = ticToken;
         }
       }
+
+      // get请求带有数组时
+      var params = options.queryParameters;
+      var url = options.path;
+      var keys = params.keys.toList();
+      var search = '';
+
+      keys.forEach((key) {
+        if (params[key] is List) {
+          params[key].forEach((item) {
+            search = '$search$key=$item&';
+          });
+          params.remove(key);
+        }
+      });
+      if (search != '') {
+        if (search[search.length - 1] == '&') {
+          search = search.substring(0, search.length - 1);
+        }
+        url = '$url?$search';
+        options.path = url;
+      }
      // 在请求被发送之前做一些事情
       return options; //continue
      // 如果你想完成请求并返回一些自定义数据，可以返回一个`Response`对象或返回`dio.resolve(data)`。
@@ -103,6 +125,34 @@ getIntegralAccount(userId) async {
     return response.data;
   } catch (e) {
     print(e.error);
+  }
+}
+
+getIntegralAccountByKind(userId, kindId) async {
+  var params = {
+    'remote_account_id': userId,
+    'integral_kind_id': kindId
+  };
+  try {
+    Response response = await dio.get(
+      '${apiPrefix}api_integral/api/v1/integral_account_kind',
+      queryParameters: params
+    );
+    return response.data;
+  } catch (e) {
+    print(e.error);
+  }
+}
+
+getIntegralRecords(params) async { // 积分交易记录 
+  try {
+    Response response = await dio.get(
+      '${apiPrefix}api_integral/api/v1/integral_records',
+      queryParameters: params
+    );
+    return response.data;
+  } catch (e) {
+    print(e);
   }
 }
 

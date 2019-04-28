@@ -8,6 +8,7 @@ import 'redux/index.dart';
 import 'apiRequest/index.dart';
 import 'utils/sharedPreferences.dart';
 import 'pages/account/login/index.dart';
+import 'container/base/index.dart';
 
 void main() async {
   final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
@@ -52,6 +53,7 @@ class _MyApp extends State<MyApp> {
         home: FutureStore(),
         navigatorKey: widget.navigatorKey,
         routes: <String, WidgetBuilder>{
+          '/base': (BuildContext context) => Base(),
           '/login': (BuildContext context) => Login(),
         },
       )

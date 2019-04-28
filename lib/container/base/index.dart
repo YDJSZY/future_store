@@ -62,13 +62,11 @@ class _Base extends State<Base> with TickerProviderStateMixin {
 
   _getEffective() async {
     var res = await getEffective();
-    var list = res['data']['rows'];
-    list.add(list[0]);
     if (res['success']) {
       setState(() {
-        rewardList = list;
+        rewardList = res['data']['rows'];
       });
-      getRandomNum(2);
+      getRandomNum(res['data']['rows'].length);
     }
   }
 
