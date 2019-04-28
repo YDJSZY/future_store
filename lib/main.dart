@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; //提供SystemUiOverlayStyle
 import 'dart:io';
-import 'container/index.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'redux/index.dart';
 import 'apiRequest/index.dart';
 import 'utils/sharedPreferences.dart';
-import 'pages/account/login/index.dart';
-import 'container/base/index.dart';
+import 'authenticationRoute.dart';
 
 void main() async {
   final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
@@ -50,12 +48,14 @@ class _MyApp extends State<MyApp> {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: FutureStore(),
+        //home: FutureStore(),
         navigatorKey: widget.navigatorKey,
-        routes: <String, WidgetBuilder>{
-          '/base': (BuildContext context) => Base(),
-          '/login': (BuildContext context) => Login(),
-        },
+        initialRoute: '/',
+        onGenerateRoute: (RouteSettings settings) {
+          bool isLogin = widget.store.state.myInfo.infos['id'] != null;
+          print(isLogin);
+          return authenticationRoute(settings, isLogin);
+        }
       )
     );
   }

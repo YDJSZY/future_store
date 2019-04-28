@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import '../../../redux/index.dart';
 import '../../../components/toast/index.dart';
 import '../../../redux/actions.dart';
 import '../../../utils/tools.dart';
@@ -21,6 +22,7 @@ class _Login extends State<Login> {
   @override
   void initState() {
     super.initState();
+    globalState.dispatch({'type': Actions.Logout});
     instantiateShowToast();
     print('Login');
   }
@@ -35,7 +37,8 @@ class _Login extends State<Login> {
     }
     if (res['ticLogin']['success'] && res['storeLogin']['result'] == 'success') {
       setUserInfo(res['ticLogin']['data'], res['storeLogin']['info']);
-      Navigator.of(context).pushNamed('/base');
+      print('9999');
+      Navigator.of(context).pushReplacementNamed('/');
       return null;
     }
     showToast.error(language['network_error']);

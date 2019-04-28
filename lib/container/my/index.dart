@@ -4,7 +4,6 @@ import '../../redux/index.dart';
 import '../../redux/actions.dart';
 import 'myAssets/index.dart';
 import 'myOrderService/index.dart';
-import '../../pages/setting/index.dart';
 
 class My extends StatefulWidget {
   @override
@@ -24,10 +23,7 @@ class _My extends State<My> {
   }
 
   gotoSetting() {
-    Navigator.push(
-      context,
-      new MaterialPageRoute(builder: (context) => Setting())
-    );
+    Navigator.pushNamed(context, '/setting');
   }
 
   @override
