@@ -143,7 +143,7 @@ class _Store extends State<Store> {
       var name = category[i]['desc'];
       var noMarginRight = (i + 1) % 5 == 0;
       var content = Container(
-        margin: EdgeInsets.only(right: noMarginRight ? 0 : 24, bottom: 16),
+        margin: EdgeInsets.only(right: noMarginRight ? 0 : 0, bottom: 16),
         child: Column(
           children: <Widget>[
             Container(
@@ -169,12 +169,13 @@ class _Store extends State<Store> {
     return Container(
       color: Color(0xFFF3F4F6),
       margin: EdgeInsets.only(bottom: 5),
-      padding: EdgeInsets.only(left: 15, top: 16, right: 16),
+      padding: EdgeInsets.only(left: 16, top: 16, right: 16),
       child: Row(
         children: <Widget>[
           Expanded(
             child: Wrap(
               alignment: WrapAlignment.center,
+              spacing: 24,
               children: buildCategoryList().toList(),
             ),
           )
@@ -220,7 +221,7 @@ class _Store extends State<Store> {
     return Container(
       color: Color(0xFFF3F4F6),
       padding: EdgeInsets.all(16),
-      height: 300,
+      height: 301,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -230,22 +231,22 @@ class _Store extends State<Store> {
           ),
           Expanded(
             child: ListView(
-            scrollDirection: Axis.horizontal, // 水平滚动,
-            children: (() {
-              List<Widget> children = [];
-              recommendProduct.forEach((item) {
-                var img = item['goods_img'];
-                var name = item['title'];
-                var price = item['shop_price'];
-                var content = Container(
-                  margin: EdgeInsets.only(right: 11),
-                  child: buildProduct(img, name, price),
-                );
-                children.add(content);
-              });
-              return children;
-            })(),
-          ),
+              scrollDirection: Axis.horizontal, // 水平滚动,
+              children: (() {
+                List<Widget> children = [];
+                recommendProduct.forEach((item) {
+                  var img = item['goods_img'];
+                  var name = item['title'];
+                  var price = item['shop_price'];
+                  var content = Container(
+                    margin: EdgeInsets.only(right: 11),
+                    child: buildProduct(img, name, price),
+                  );
+                  children.add(content);
+                });
+                return children;
+              })(),
+            ),
           )
         ],
       ),

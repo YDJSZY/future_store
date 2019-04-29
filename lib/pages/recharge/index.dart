@@ -58,7 +58,10 @@ class _Recharge extends State<Recharge> {
                         size: 200.0,
                       ),
                     ),
-                    Text(wallet['address'], style: TextStyle(color: Color(0xFF313131), fontSize: 15)),
+                    Padding(
+                      padding: EdgeInsets.only(left: 30, right: 30),
+                      child: Text(wallet['address'], style: TextStyle(color: Color(0xFF313131), fontSize: 15)),
+                    ),
                     Container(
                       margin: EdgeInsets.only(top: 60),
                       width: 100,
