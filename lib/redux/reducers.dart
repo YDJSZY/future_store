@@ -7,8 +7,13 @@ import '../utils/sharedPreferences.dart';
 AppState mainReducer(AppState state, dynamic action) {
   switch (action['type']) {
     case Actions.SetMyInfo:
-      globalPrefs.setString('userInfo', json.encode(action['data']));
-      state.myInfo.infos = action['data'];
+      var key = action['key'];
+      globalPrefs.setString(key, json.encode(action['data']));
+      if (key == 'userInfo') {
+        state.myInfo.infos = action['data'];
+      } else {
+        state.myInfo.wallet = action['data'];
+      }
       return state;
 
     case Actions.SetLanguage:
@@ -22,7 +27,9 @@ AppState mainReducer(AppState state, dynamic action) {
 
     case Actions.Logout:
       globalPrefs.setString('userInfo', null);
+      globalPrefs.setString('wallet', null);
       state.myInfo.infos = {};
+      state.myInfo.wallet = {};
       state.storeUserInfo.infos = {};
       return state;
 

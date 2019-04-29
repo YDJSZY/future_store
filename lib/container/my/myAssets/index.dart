@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import '../../../pages/transactionRecord/index.dart';
+import '../../../pages/withdrawToken/index.dart';
 import '../../../apiRequest/index.dart';
 import '../../../redux/index.dart';
 import '../../../utils/tools.dart';
@@ -42,17 +43,16 @@ class _MyAssets extends State<MyAssets> {
     setState(() {
       integralAccount = _integralAccount;
     });
-    _getPricingRate();
+    _getPricingRate(_integralAccount['balance']);
   }
 
-  _getPricingRate() async {
+  _getPricingRate(balance) async {
     var params = {'curno': pricingType};
-    print(123);
     var res = await getPricingRate(params);
-    print(res);
-    print(integralAccount['balance']);
-    exchangeRatePrice = (integralAccount['balance'] * res).toString();
-    print(exchangeRatePrice);
+    if (res is String) {
+      res = double.parse(res);
+    }
+    exchangeRatePrice = (balance * res).toString();
     setState(() {
       exchangeRatePrice = exchangeRatePrice;
     });
@@ -63,6 +63,17 @@ class _MyAssets extends State<MyAssets> {
       context,
       new MaterialPageRoute(builder: (context) => TransactionRecord(integralKindId))
     );
+  }
+
+  gotoWithdrawToken() {
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => WithdrawToken(integralKindId))
+    );
+  }
+
+  goto(String path) {
+    Navigator.pushNamed(context, path);
   }
 
   @override
@@ -124,6 +135,7 @@ class _MyAssets extends State<MyAssets> {
                   children: <Widget>[
                     Expanded(
                       child: GestureDetector(
+                        onTap: gotoWithdrawToken,
                         child: Container(
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
@@ -135,6 +147,7 @@ class _MyAssets extends State<MyAssets> {
                     ),
                     Expanded(
                       child: GestureDetector(
+                        onTap: () => goto('/recharge'),
                         child: Container(
                           alignment: Alignment.center,
                           child: Text(state.language.data['deposit'], style: TextStyle(color: Color(0xFF000000), fontSize: 13),),

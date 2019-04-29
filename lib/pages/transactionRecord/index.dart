@@ -32,9 +32,10 @@ class TransactionRecord extends StatefulWidget {
 }
 
 class _TransactionRecord extends State<TransactionRecord> {
+  ScrollController _scrollController = new ScrollController();
   int userId = globalState.state.myInfo.infos['id'];
   double balance = 0;
-  List records = [];
+  var records;
   Map<String, dynamic> requestRecordParams = {'page': 1, 'size': 10, 'remote_type': 'client'};
   String exchangeRatePrice = '';
   String selectTab = 'all';
@@ -43,42 +44,59 @@ class _TransactionRecord extends State<TransactionRecord> {
   @override
   void initState() {
     super.initState();
+    listenScroll();
     requestRecordParams['integral_kind_id'] = widget.integralKindId;
     requestRecordParams['remote_account_id'] = userId;
     _getIntegralAccountByKind();
     _getTransactionRecord(requestRecordParams);
   }
 
+  listenScroll() {
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==  _scrollController.position.maxScrollExtent) {
+        requestRecordByPage(++requestRecordParams['page']);
+      }
+    });
+  }
+
   _getIntegralAccountByKind() async {
     var res = await getIntegralAccountByKind(userId, widget.integralKindId);
-    _getPricingRate();
     if (res['success']) {
       var _balance = divPrecision(val: res['data']['balance']);
+      _getPricingRate(_balance);
       setState(() {
         balance = _balance;
       });
     }
   }
 
-  _getTransactionRecord(requestRecordParams) async {
+  _getTransactionRecord(params) async {
     var selectTabData = tabTypes.where((item) => item['text'] == selectTab).toList()[0];
     var key = selectTabData['key'];
     if (key != null) {
-      requestRecordParams[key] = selectTabData['value'].split('&');
+      params[key] = selectTabData['value'].split('&');
     }
-    var res = await getIntegralRecords(requestRecordParams);
+    var res = await getIntegralRecords(params);
+    if (res['data']['results'].length == 0) --requestRecordParams['page'];
     if (res['success']) {
+      var list = records;
+      if (params['page'] == 1) {
+        list = res['data']['results'];
+      } else {
+        list = list..addAll(res['data']['results']);
+      }
       setState(() {
-        records = res['data']['results'];
+        records = list;
       });
     }
   }
 
-  _getPricingRate() async {
+  _getPricingRate(balance) async {
     var params = {'curno': pricingType};
     var res = await getPricingRate(params);
-    print(res);
-    print(balance * res);
+    if (res is String) {
+      res = double.parse(res);
+    }
     exchangeRatePrice = (balance * res).toString();
     setState(() {
       exchangeRatePrice = exchangeRatePrice;
@@ -86,19 +104,27 @@ class _TransactionRecord extends State<TransactionRecord> {
   }
 
   Future onRefresh() async {
+    await requestRecordByPage(1);
+  }
 
+  requestRecordByPage(int page) async {
+    requestRecordParams['page'] = page;
+    Map<String, dynamic> _requestRecordParams = Map.from(requestRecordParams);
+    return await _getTransactionRecord(_requestRecordParams);
   }
 
   onSelectTab(String tab) {
+    if (tab == selectTab) return;
     setState(() {
       selectTab = tab;
+      records = null;
     });
-    Map<String, dynamic> _requestRecordParams = Map.from(requestRecordParams);
-    _requestRecordParams['page'] = 1;
-    _getTransactionRecord(_requestRecordParams);
+    requestRecordByPage(1);
   }
 
-  gotoWithdraw() {}
+  goto(String path) {
+    Navigator.pushNamed(context, path);
+  }
 
   Widget buildBalance(pricingType) {
     return Container(
@@ -139,13 +165,22 @@ class _TransactionRecord extends State<TransactionRecord> {
     );
   }
 
+  Widget buildNoData() {
+    var language = globalState.state.language.data;
+    return Padding(
+      padding: EdgeInsets.only(top: 16),
+      child: Text(language['no_data'], style: TextStyle(fontSize: 16)),
+    );
+  }
+
   Widget buildRecordDetail() {
     return Expanded(
       child: Container(
         child: RefreshIndicator(
           onRefresh: onRefresh,
-          child: ListView.builder(
+          child: records == null ? Container() : (records.length == 0 ? buildNoData() : ListView.builder(
             itemCount: records.length,
+            controller: _scrollController,
             itemBuilder: (BuildContext context, int index){
               var record = records[index];
               var operateType = record['operate_type'];
@@ -187,7 +222,7 @@ class _TransactionRecord extends State<TransactionRecord> {
                 ),
               );
             },
-          ),
+          )),
         ),
       )
     );
@@ -237,7 +272,7 @@ class _TransactionRecord extends State<TransactionRecord> {
         return Scaffold(
           appBar: AppBar(
             iconTheme: IconThemeData(
-              color: Color(0xFF000000), //change your color here
+              color: Color(0xFF26262E), //change your color here
             ),
             title: Text('PPTR', style: TextStyle(color: Color(0xFF26262E), fontSize: 18),),
             centerTitle: true,
@@ -251,35 +286,37 @@ class _TransactionRecord extends State<TransactionRecord> {
               ],
             ),
           ),
-          bottomSheet: Container(
-            width: double.infinity,
-            padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
-            color: Colors.white,
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(right: 9),
-                    child: OutlineButton(
-                      borderSide: BorderSide(width: 1, color: Color(0xFF70A6FF)),
-                      onPressed: gotoWithdraw,
+          bottomNavigationBar: BottomAppBar(
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
+              color: Colors.white,
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 9),
+                      child: OutlineButton(
+                        borderSide: BorderSide(width: 1, color: Color(0xFF70A6FF)),
+                        onPressed: () => goto('/withdraw'),
+                        padding: EdgeInsets.only(top: 15, bottom: 15),
+                        color: Colors.white,
+                        child: Text(state.language.data['withdraw'], style: TextStyle(color: Color(0xFF70A6FF), fontSize: 15)),
+                      ),
+                    )
+                  ),
+                  Expanded(
+                    child: FlatButton(
+                      onPressed: () => goto('/recharge'),
                       padding: EdgeInsets.only(top: 15, bottom: 15),
-                      color: Colors.white,
-                      child: Text(state.language.data['withdraw'], style: TextStyle(color: Color(0xFF70A6FF), fontSize: 15)),
+                      color: Color(0xFF70A6FF),
+                      child: Text(state.language.data['deposit'], style: TextStyle(color: Colors.white, fontSize: 15)),
                     ),
                   )
-                ),
-                Expanded(
-                  child: FlatButton(
-                    onPressed: gotoWithdraw,
-                    padding: EdgeInsets.only(top: 15, bottom: 15),
-                    color: Color(0xFF70A6FF),
-                    child: Text(state.language.data['deposit'], style: TextStyle(color: Colors.white, fontSize: 15)),
-                  ),
-                )
-              ],
-            ),
-          ),
+                ],
+              ),
+            )
+          )
         );
       }
     );

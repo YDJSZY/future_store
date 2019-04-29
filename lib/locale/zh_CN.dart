@@ -552,5 +552,7 @@ const Map<String, String> zh_CN = {
   'day': '天',
   'noAllowed': '无法提取',
   'maturity': '到期提本',
-  'product_category': '商品分类'
+  'product_category': '商品分类',
+  'fund_withdraw': '提现',
+  'fund_invest': '投资',
 };

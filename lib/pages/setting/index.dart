@@ -42,11 +42,16 @@ class Setting extends StatefulWidget {
 class _Setting extends State<Setting> {
   goto(link) {
     if (link == null || link == '') return;
-    Navigator.pushNamed(context, link);
+    if (link == '/login') { // 弹出之前的所有路由
+      Navigator.of(context).pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
+    } else {
+      Navigator.pushNamed(context, link);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    print(789);
     return new StoreConnector<dynamic, dynamic>(
       converter: (store) => store.state,//转换从redux拿回来的值
       builder: (context, state) {

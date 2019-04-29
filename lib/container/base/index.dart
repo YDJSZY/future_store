@@ -104,7 +104,7 @@ class _Base extends State<Base> with TickerProviderStateMixin {
   Widget buildBalance() {
     return Container(
       padding: EdgeInsets.fromLTRB(12, 9, 12, 9),
-      width: 170,
+      width: 200,
       decoration: BoxDecoration(
         color: Color(0xFF1C222F),
         borderRadius: BorderRadius.all(Radius.circular(13)),

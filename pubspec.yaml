@@ -29,6 +29,7 @@ dependencies:
   flutter_swiper: ^1.1.4
   shared_preferences: ^0.5.2
   fluttertoast: ^3.0.4
+  qr_flutter: ^2.0.0
 
 dev_dependencies:
   flutter_test:

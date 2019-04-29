@@ -79,8 +79,9 @@ loginApp(Map data) async {
     loginTicRes = json.decode(loginTicRes);
   }
   if (!loginTicRes['success']) return {'ticLogin': loginTicRes};
+  var wallet = await getUserWalletInfo(loginTicRes['data']);
   var loginStoreRes = await loginStore(data);
-  return {'ticLogin': loginTicRes, 'storeLogin': loginStoreRes};
+  return {'ticLogin': loginTicRes, 'storeLogin': loginStoreRes, 'wallet': wallet};
 }
 
 loginTic(data) async {
@@ -112,6 +113,46 @@ loginStore(data) async {
         extra: {'token': false}
       ));
     return response.data;
+  } catch (e) {
+    print(e.error);
+  }
+}
+
+getUserWalletInfo(userData) async {
+  var id = userData['id'];
+  var token = userData['token'];
+  try {
+    Response response = await dio.get(
+      '${apiPrefix}walletandtoken/api/v1/wallets/query', 
+      queryParameters: {'user_id': id},
+      options: Options(
+        extra: {'token': false},
+        headers: {
+          'Authorization': token
+        }
+      )
+    );
+    if (!response.data['success'] || response.data['data']['count'] == 0) {
+      return await createUserWallet(token);
+    }
+    return response.data['data']['rows'][0];
+  } catch (e) {
+    print(e.error);
+  }
+}
+
+createUserWallet(token) async {
+  try {
+    Response response = await dio.post(
+      '${apiPrefix}walletandtoken/api/v1/eth/wallet', 
+      options: Options(
+        extra: {'token': false},
+        headers: {
+          'Authorization': token
+        }
+      )
+    );
+    return response.data['data'];
   } catch (e) {
     print(e.error);
   }
@@ -266,7 +307,10 @@ getPricingRate(Map<dynamic, dynamic> params) async { // 计价方式
       '${apiPrefix}api_kline/api/v1/kline/token/pptr',
       queryParameters: params,
     );
-    if (response.data['success']) return response.data['data']['price'];
+    if (response.data['success']) {
+      var price = response.data['data']['price'];
+      return price == null ? 0 : price;
+    }
     return 0;
   } catch (e) {
     print(e);

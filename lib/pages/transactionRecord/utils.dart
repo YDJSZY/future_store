@@ -16,6 +16,10 @@ getTransactionType(type) {
       return language['transfer_obtain']; // 转账接受
     case 'transferFee':
       return language['transfer_fee']; // 转账手续费
+    case 'fund_withdraw':
+      return language['fund_withdraw']; // 提现
+    case 'fund_invest':
+      return language['fund_invest']; // 投资
     case 'changeless':
       return language['mining_award']; // 挖矿奖励
     case 'dynamic':

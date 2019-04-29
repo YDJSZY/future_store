@@ -1,6 +1,7 @@
 class MyInfo {
   Map infos;
-  MyInfo(this.infos);
+  Map wallet;
+  MyInfo(this.infos, this.wallet);
 }
 
 class StoreUserInfo {

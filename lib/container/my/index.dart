@@ -46,7 +46,7 @@ class _My extends State<My> {
                         end: Alignment.bottomCenter,
                         colors: [Color(0xFF525252), Color(0xFF1F1F1F)]
                       )
-                    ),
+                    ), // 渐变背景色
                     child: Column(
                       children: <Widget>[
                         Row(

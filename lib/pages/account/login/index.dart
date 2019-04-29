@@ -32,11 +32,12 @@ class _Login extends State<Login> {
     if (!validateRes) return null;
     Map data = {'email': email, 'password': password};
     var res = await loginApp(data);
+    print(res);
     if (!res['ticLogin']['success']) {
       return showToast.error(res['ticLogin']['message']);
     }
     if (res['ticLogin']['success'] && res['storeLogin']['result'] == 'success') {
-      setUserInfo(res['ticLogin']['data'], res['storeLogin']['info']);
+      setUserInfo(res['ticLogin']['data'], res['storeLogin']['info'], res['wallet']);
       print('9999');
       Navigator.of(context).pushReplacementNamed('/');
       return null;
@@ -112,8 +113,9 @@ class _Login extends State<Login> {
                                       converter: (store) {
                                         // Return a `VoidCallback`, which is a fancy name for a function
                                         // with no parameters. It only dispatches an Increment action.
-                                        return (ticUserInfo, storeUserInfo) {
-                                          store.dispatch({'type': Actions.SetMyInfo, 'data': ticUserInfo});
+                                        return (ticUserInfo, storeUserInfo, wallet) {
+                                          store.dispatch({'type': Actions.SetMyInfo, 'data': ticUserInfo, 'key': 'userInfo'});
+                                          store.dispatch({'type': Actions.SetMyInfo, 'data': wallet, 'key': 'wallet'});
                                           store.dispatch({'type': Actions.SetStoreUserInfo, 'data': storeUserInfo});
                                         };
                                       },
