@@ -138,12 +138,13 @@ class _Store extends State<Store> {
 
   List<Widget> buildCategoryList() {
     List<Widget> contentList = [];
-    for (var i = 0; i < category.length; i++) {
+    List<Widget> rowChildren = [];
+    int len = category.length;
+    for (var i = 0; i < len; i++) { // 5个就放到一个Row里
       var img = category[i]['img'];
       var name = category[i]['desc'];
-      var noMarginRight = (i + 1) % 5 == 0;
       var content = Container(
-        margin: EdgeInsets.only(right: noMarginRight ? 0 : 0, bottom: 16),
+        margin: EdgeInsets.only(bottom: 16),
         child: Column(
           children: <Widget>[
             Container(
@@ -160,7 +161,15 @@ class _Store extends State<Store> {
           ],
         ),
       );
-      contentList.add(content);
+      rowChildren.add(content);
+      if ((i + 1) % 5 == 0) {
+        var row = Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: rowChildren,
+        );
+        contentList.add(row);
+        rowChildren = [];
+      }
     }
     return contentList;
   }
@@ -170,16 +179,8 @@ class _Store extends State<Store> {
       color: Color(0xFFF3F4F6),
       margin: EdgeInsets.only(bottom: 5),
       padding: EdgeInsets.only(left: 16, top: 16, right: 16),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 24,
-              children: buildCategoryList().toList(),
-            ),
-          )
-        ],
+      child: Column(
+        children: buildCategoryList().toList(),
       )
     );
   }

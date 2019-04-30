@@ -20,7 +20,8 @@ class ShowToast {
       msg: msg,
       gravity: getPosition(gravity),
       backgroundColor: Color(0xFF15D78D),
-      textColor: Colors.white
+      textColor: Colors.white,
+      timeInSecForIos: 5
     );
   }
 

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import '../../apiRequest/index.dart';
 import '../../redux/index.dart';
 import '../../utils/tools.dart';
+import '../../components/toast/index.dart';
+import '../../components/modalPassword/index.dart';
 
 class WithdrawToken extends StatefulWidget {
   final int integralKindId;
@@ -17,22 +20,95 @@ class WithdrawToken extends StatefulWidget {
 
 class _WithdrawToken extends State<WithdrawToken> {
   int userId = globalState.state.myInfo.infos['id'];
+  Map language = globalState.state.language.data;
+  String feeText = '--';
+  double feeRate = 0;
+  num least;
+  double maxAmount;
+  String amount = '';
+  String address = '';
   double balance;
+  //TextEditingController _amountCtrl = TextEditingController();
+
   @override
   void initState() {
     super.initState();
+    instantiateShowToast();
     _getIntegralAccountByKind();
+    _getFeeRate();
   }
 
   _getIntegralAccountByKind() async {
     var res = await getIntegralAccountByKind(userId, widget.integralKindId);
-    print(res);
     if (res['success']) {
       var _balance = divPrecision(val: res['data']['balance']);
       setState(() {
         balance = _balance;
       });
     }
+  }
+
+  _getFeeRate() async {
+    const params = {'token_name': 'PPTR'};
+    var res = await getFeeRate(params);
+    print(res);
+    if (res['success']) {
+      var data = res['data']['rows'][0];
+      setState(() {
+        feeRate = double.parse(data['fee_rate']) / 100;
+        least = divPrecision(val: data['min_pick_amount']);
+        maxAmount = divPrecision(val: data['max_amount']);
+      });
+    }
+  }
+
+  addressOnChange(val) {
+    setState(() {
+      address = val;
+    });
+  }
+
+  submit() async {
+    if (amount == '' || address == '') return;
+    if (!await validate()) return;
+    showPasswordModal();
+  }
+
+  validate() async {
+    /* if (!await validateWalletAddress(address)) {
+      showToast.error(language['enter_valid_address']);
+      return false;
+    }
+    if (await isCurrentPlatformAddress(address)) { // 是否是平台内的地址
+      showToast.error(language['platform_address_invalid']);
+      return false;
+    } */
+    if (num.parse(amount) < least) {
+      showToast.error(language['error_minimum_withdraw_amount']);
+      return false;
+    }
+    if (balance < num.parse(feeText) || num.parse(amount) > balance) {
+      showToast.error(language['balance_not_enough']);
+      return false;
+    }
+    return true;
+  }
+
+  showPasswordModal() {
+    showDialog<Null>(
+    context: context, //BuildContext对象
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return ModalPassword(context);
+    });
+  }
+
+  amountChange(val) {
+    var _feeText = val == '' ? '--' : (feeRate * num.parse(val)).toStringAsFixed(2);
+    setState(() {
+      amount = val;
+      feeText = _feeText;
+    });
   }
 
   @override
@@ -73,7 +149,7 @@ class _WithdrawToken extends State<WithdrawToken> {
                           border: InputBorder.none, // 去掉input下划线
                           labelText: language['input_withdraw_address'],
                         ),
-                        //onChanged: (val) { inputOnChange('password', val);},
+                        onChanged: addressOnChange,
                       )
                     ],
                   ),
@@ -88,15 +164,18 @@ class _WithdrawToken extends State<WithdrawToken> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(language['withdraw_amount'], style: TextStyle(color: Color(0xFF313131), fontSize: 13)),
-                          Text('${language['donate_fee']}: ', style: TextStyle(color: Color(0xFF70A6FF), fontSize: 11))
+                          Text('${language['donate_fee']}: $feeText', style: TextStyle(color: Color(0xFF70A6FF), fontSize: 11))
                         ],
                       ),
                       TextField(
+                        //controller: _amountCtrl,
+                        keyboardType: TextInputType.number, // 数字键盘优先
+                        inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],//只允许输入数字
                         decoration: InputDecoration(
                           border: InputBorder.none, // 去掉input下划线
                           labelText: language['minimum_withdraw_amount'],
                         ),
-                        //onChanged: (val) { inputOnChange('password', val);},
+                        onChanged: amountChange
                       )
                     ],
                   ),
@@ -105,7 +184,8 @@ class _WithdrawToken extends State<WithdrawToken> {
                   margin: EdgeInsets.only(top: 100),
                   width: 247,
                   child: FlatButton(
-                    onPressed: () {},
+                    onPressed: submit,
+                    disabledColor: Color(0xFF69BFF1),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(22))),
                     padding: EdgeInsets.only(top: 15, bottom: 15),
                     color: Color(0xFF70A6FF),

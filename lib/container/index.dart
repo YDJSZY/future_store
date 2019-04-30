@@ -29,7 +29,6 @@ class _FutureStore extends State<FutureStore> {
     return new StoreConnector<dynamic, int>(
         converter: (store) => store.state.myInfo.infos['id'],//转换从redux拿回来的值
         builder: (context, id) {
-          print(id);
           return id == null ? Login() :
             Scaffold(
               body: containerList[_currentIndex],

@@ -185,6 +185,56 @@ getIntegralAccountByKind(userId, kindId) async {
   }
 }
 
+getFeeRate(params) async {
+  try {
+    Response response = await dio.get(
+      '${apiPrefix}api_blockchain/api/v1/pickCoinFee',
+      queryParameters: params
+    );
+    return response.data;
+  } catch (e) {
+    print(e.error);
+  }
+}
+
+isCurrentPlatformAddress(String address) async { // 是否是本平台内的地址
+  try {
+    Response response = await dio.get(
+      '${apiPrefix}walletandtoken/api/v1/usdt/wallet/support',
+      queryParameters: {'address': address}
+    );
+    return response.data['data']['supported'];
+  } catch (e) {
+    print(e.error);
+  }
+}
+
+validateWalletAddress(address) async {
+  var params = {'address': address, 'currency': 'ETH', 'networkType': 'both'};
+  try {
+    Response response = await dio.get(
+      '${apiPrefix}walletandtoken/api/v1/walletValidate',
+      queryParameters: params
+    );
+    return response.data['data']['isValid'];
+  } catch (e) {
+    print(e.error);
+  }
+}
+
+validatePayPassword(String password) async {
+  print(password);
+  try {
+    Response response = await dio.post(
+      '${apiPrefix}account/api/v1/pay/verify',
+      data: {'password': password}
+    );
+    return response.data;
+  } catch (e) {
+    print(e.error);
+  }
+}
+
 getIntegralRecords(params) async { // 积分交易记录 
   try {
     Response response = await dio.get(

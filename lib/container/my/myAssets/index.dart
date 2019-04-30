@@ -134,6 +134,7 @@ class _MyAssets extends State<MyAssets> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Expanded(
+                      flex: 1,
                       child: GestureDetector(
                         onTap: gotoWithdrawToken,
                         child: Container(
@@ -141,16 +142,18 @@ class _MyAssets extends State<MyAssets> {
                           decoration: BoxDecoration(
                             border: Border(right: BorderSide(width: 1, color: Color(0xFFE5E5E5)))
                           ),
-                          child: Text(state.language.data['withdraw'], style: TextStyle(color: Color(0xFF000000), fontSize: 13),),
+                          child: Text(state.language.data['withdraw'], style: TextStyle(color: Color(0xFF000000), fontSize: 13)),
                         ),
                       ),
                     ),
                     Expanded(
+                      flex: 1,
                       child: GestureDetector(
                         onTap: () => goto('/recharge'),
                         child: Container(
                           alignment: Alignment.center,
-                          child: Text(state.language.data['deposit'], style: TextStyle(color: Color(0xFF000000), fontSize: 13),),
+                          color: Colors.transparent,
+                          child: Text(state.language.data['deposit'], style: TextStyle(color: Color(0xFF000000), fontSize: 13)),
                         ),
                       ),
                     )
