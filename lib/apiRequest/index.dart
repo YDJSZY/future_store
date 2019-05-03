@@ -366,3 +366,15 @@ getPricingRate(Map<dynamic, dynamic> params) async { // 计价方式
     print(e);
   }
 }
+
+withdrawToken(data) async {
+  try {
+    Response response = await dio.post(
+      '${apiPrefix}api_blockchain/api/v1/eth/pickCoin',
+      data: data,
+    );
+    return response.data;
+  } catch (e) {
+    print(e);
+  }
+}

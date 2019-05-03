@@ -53,6 +53,10 @@ flutter:
     - lib/assets/imgs/coin-s.png
     - lib/assets/imgs/platform_token_ss.png
     - lib/assets/imgs/head.png
+    - lib/assets/imgs/ok.svg
+    - lib/assets/imgs/noOk.svg
+    - lib/assets/imgs/check.png
+    - lib/assets/imgs/attention.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

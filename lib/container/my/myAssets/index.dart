@@ -25,6 +25,7 @@ class _MyAssets extends State<MyAssets> {
   String pricingType = globalState.state.pricingType.type;
   String exchangeRatePrice = '';
   int integralKindId;
+  int tokenId;
 
   @override
   void initState() {
@@ -39,6 +40,8 @@ class _MyAssets extends State<MyAssets> {
     List data = res['data'];
     var _integralAccount = data.where((item) => item['symbol'] == 'PPTR').toList()[0];
     integralKindId = _integralAccount['integral_kind_id'];
+    tokenId = num.parse(_integralAccount['token_id']);
+    print(_integralAccount);
     _integralAccount['balance'] = divPrecision(val: _integralAccount['balance']);
     setState(() {
       integralAccount = _integralAccount;
@@ -68,7 +71,7 @@ class _MyAssets extends State<MyAssets> {
   gotoWithdrawToken() {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => WithdrawToken(integralKindId))
+      new MaterialPageRoute(builder: (context) => WithdrawToken(integralKindId, tokenId))
     );
   }
 

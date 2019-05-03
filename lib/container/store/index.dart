@@ -129,8 +129,6 @@ class _Store extends State<Store> {
           );
         },
         itemCount: slideList.length,
-        //viewportFraction: 0.8,
-        //scale: 0.9,
         pagination: SwiperPagination()
       ),
     );
@@ -200,6 +198,7 @@ class _Store extends State<Store> {
             ),
           ),
           Container(
+            width: double.infinity,
             color: Colors.white,
             padding: EdgeInsets.only(top: 11, left: 12, bottom: 13),
             child: Column(

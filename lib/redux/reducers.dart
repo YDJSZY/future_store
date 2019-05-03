@@ -37,6 +37,10 @@ AppState mainReducer(AppState state, dynamic action) {
       state.pricingType.type = action['data'];
       return state;
 
+    case Actions.SetSelectToken:
+      state.selectToken.token = action['data'];
+      return state;
+
     default:
       return state;
   }

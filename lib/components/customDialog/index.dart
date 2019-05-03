@@ -10,9 +10,9 @@ class CustomDialog extends Dialog {
   Map language = globalState.state.language.data;
   Function confirmCallback;
   BuildContext ctx;
+  bool isFixing = false;
 
   CustomDialog({Key key, String title, Widget body, double height = 229, String confirmText = 'confirm', @required Function confirmCallback, @required ctx}) : super(key: key) {
-    print(title);
     this.title = title;
     this.body = body;
     this.height = height;
@@ -68,7 +68,10 @@ class CustomDialog extends Dialog {
   }
 
   confirm() async {
+    if (isFixing) return null;
+    isFixing = true;
     var res = await confirmCallback();
+    isFixing = false;
     if (res) return cancel(); // 返回值为真则关闭对话框
   }
 

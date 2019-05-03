@@ -6,8 +6,9 @@ import '../squareInput/index.dart';
 
 class ModalPassword extends StatefulWidget {
   final BuildContext ctx;
+  final Function callback;
 
-  ModalPassword(this.ctx);
+  ModalPassword(this.ctx, this.callback);
 
   @override
   State<StatefulWidget> createState() {
@@ -27,10 +28,12 @@ class _ModalPassword extends State<ModalPassword> {
   }
 
   validatePassword() async {
-    print(password);
     var res = await validatePayPassword(password);
-    print(res);
-    return res['success'];
+    if (res['success']) {
+      widget.callback();
+      return true;
+    }
+    return false;
   }
 
   savePassword(psd) {
@@ -60,6 +63,6 @@ class _ModalPassword extends State<ModalPassword> {
 
   @override
   Widget build(BuildContext context) {
-    return CustomDialog(title: title, body: buildModalBody(), ctx: widget.ctx, confirmCallback: validatePassword,);
+    return CustomDialog(title: title, body: buildModalBody(), ctx: widget.ctx, confirmCallback: validatePassword);
   }
 }

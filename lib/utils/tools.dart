@@ -5,7 +5,12 @@ bool isEmail(val) {
   return regRes;
 }
 
-dynamic divPrecision({val, precision}) {
+num divPrecision({val, precision}) {
   var _precision = precision == null ? 1e8 : precision;
-  return int.parse(val) / _precision;
+  return num.parse(val) / _precision;
+}
+
+num mulPrecision({val, precision}) {
+  var _precision = precision == null ? 1e8 : precision;
+  return num.parse(val) * _precision;
 }

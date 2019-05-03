@@ -24,18 +24,25 @@ class PricingType {
   PricingType(this.type);
 }
 
+class SelectToken {
+  Map token;
+  SelectToken(this.token);
+}
+
 class AppState {
   MyInfo myInfo;
   StoreUserInfo storeUserInfo;
   Language language;
   PricingType pricingType;
   Locale locale;
+  SelectToken selectToken;
 
   AppState({
     this.myInfo,
     this.storeUserInfo,
     this.language,
     this.pricingType,
-    this.locale
+    this.locale,
+    this.selectToken
   });
 }

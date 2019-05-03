@@ -3,5 +3,6 @@ enum Actions {
   SetStoreUserInfo,
   SetLanguage,
   Logout,
-  SetPricingType
+  SetPricingType,
+  SetSelectToken,
 }

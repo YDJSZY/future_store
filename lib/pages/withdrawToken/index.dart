@@ -6,11 +6,13 @@ import '../../redux/index.dart';
 import '../../utils/tools.dart';
 import '../../components/toast/index.dart';
 import '../../components/modalPassword/index.dart';
+import '../result/index.dart';
 
 class WithdrawToken extends StatefulWidget {
   final int integralKindId;
+  final int tokenId;
 
-  WithdrawToken(this.integralKindId);
+  WithdrawToken(this.integralKindId, this.tokenId);
 
   @override
   State<StatefulWidget> createState() {
@@ -75,14 +77,14 @@ class _WithdrawToken extends State<WithdrawToken> {
   }
 
   validate() async {
-    /* if (!await validateWalletAddress(address)) {
+    if (!await validateWalletAddress(address)) {
       showToast.error(language['enter_valid_address']);
       return false;
     }
     if (await isCurrentPlatformAddress(address)) { // 是否是平台内的地址
       showToast.error(language['platform_address_invalid']);
       return false;
-    } */
+    }
     if (num.parse(amount) < least) {
       showToast.error(language['error_minimum_withdraw_amount']);
       return false;
@@ -99,8 +101,28 @@ class _WithdrawToken extends State<WithdrawToken> {
     context: context, //BuildContext对象
     barrierDismissible: false,
     builder: (BuildContext context) {
-      return ModalPassword(context);
+      return ModalPassword(context, commitSubmit);
     });
+  }
+
+  commitSubmit() async {
+    var data = {
+      'sender_id': userId,
+      'integral_kind_id': widget.integralKindId, // 币种
+      'token_id': widget.tokenId, // 币地址
+      'receive_address': address, // 提币地址 0x48A6004960D976308B3afdF29D70075814380B80
+      'amount': mulPrecision(val: amount).toStringAsFixed(0), // 提币数量
+      'origin': 'app',  
+      'only': 'pptr',
+      'token_name': 'PPTR'
+    };
+    print(data);
+    var res = await withdrawToken(data);
+    if (!res['success']) return showToast.error(language['network_error']);
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => Result(language['withdraw_application'], language['apply_results'], true))
+    );
   }
 
   amountChange(val) {
@@ -173,7 +195,7 @@ class _WithdrawToken extends State<WithdrawToken> {
                         inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],//只允许输入数字
                         decoration: InputDecoration(
                           border: InputBorder.none, // 去掉input下划线
-                          labelText: language['minimum_withdraw_amount'],
+                          labelText: '${language['minimum_withdraw_amount']} $least',
                         ),
                         onChanged: amountChange
                       )
