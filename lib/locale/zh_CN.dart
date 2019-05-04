@@ -504,6 +504,7 @@ const Map<String, String> zh_CN = {
 
   'invoice_no': '发货单号',
   'discover_version': '发现新版本',
+  'goods_tel': '联系客服',
 
   // v2
   'set_up_shop': '我要开店',

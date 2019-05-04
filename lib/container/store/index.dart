@@ -3,6 +3,7 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import 'dart:convert';
 import 'package:flutter_redux/flutter_redux.dart';
 import '../../apiRequest/index.dart';
+import '../../pages/productDetail/index.dart';
 
 class Store extends StatefulWidget {
   @override
@@ -59,7 +60,6 @@ class _Store extends State<Store> {
       'cat_id': data['allValue']['categorySOption']
     };
     var res = await getProduct(params);
-    print(res['product']);
     setState(() {
       ecommerceData = res['product'];
     });
@@ -79,6 +79,13 @@ class _Store extends State<Store> {
 
   gotoSearch() {
 
+  }
+
+  gotoDetail(goodsId) {
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => ProductDetail(goodsId))
+    );
   }
 
   Widget buildSearch(Map language) {
@@ -183,37 +190,40 @@ class _Store extends State<Store> {
     );
   }
 
-  Widget buildProduct(String img, String name, String price) {
-    return Container(
-      width: 166,
-      child: Column(
-        children: <Widget>[
-          Container(
-            height: 166,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: NetworkImage(img),
-                fit: BoxFit.fill
+  Widget buildProduct(String img, String name, String price, String goodsId) {
+    return GestureDetector(
+      onTap: () => gotoDetail(goodsId),
+      child: Container(
+        width: 166,
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: 166,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(img),
+                  fit: BoxFit.fill
+                )
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              color: Colors.white,
+              padding: EdgeInsets.only(top: 11, left: 12, bottom: 13),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 10),
+                    child: Text(name, style: TextStyle(fontSize: 13, color: Color(0xFF313131)), overflow: TextOverflow.ellipsis,),
+                  ),
+                  Text(price, style: TextStyle(fontSize: 13, color: Color(0xFFE60012))),
+                ],
               )
             ),
-          ),
-          Container(
-            width: double.infinity,
-            color: Colors.white,
-            padding: EdgeInsets.only(top: 11, left: 12, bottom: 13),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(bottom: 10),
-                  child: Text(name, style: TextStyle(fontSize: 13, color: Color(0xFF313131)), overflow: TextOverflow.ellipsis,),
-                ),
-                Text(price, style: TextStyle(fontSize: 13, color: Color(0xFFE60012))),
-              ],
-            )
-          ),
-        ],
-      ),
+          ],
+        ),
+      )
     );
   }
 
@@ -238,10 +248,11 @@ class _Store extends State<Store> {
                   var img = item['goods_img'];
                   var name = item['title'];
                   var price = item['shop_price'];
+                  var goodsId = item['goods_id'];
                   var content = Container(
-                    margin: EdgeInsets.only(right: 11),
-                    child: buildProduct(img, name, price),
-                  );
+                      margin: EdgeInsets.only(right: 11),
+                      child: buildProduct(img, name, price, goodsId),
+                    );
                   children.add(content);
                 });
                 return children;
@@ -276,12 +287,13 @@ class _Store extends State<Store> {
                       var img = item['goods_img'];
                       var name = item['title'];
                       var price = item['shop_price'];
+                      var goodsId = item['goods_id'];
                       var wrap = (i + 1) % 2 == 0;
                       var content = Expanded(
                         flex: 1,
                         child: Container(
                           margin: EdgeInsets.only(right: wrap ? 0 : 11),
-                          child: buildProduct(img, name, price),
+                          child: buildProduct(img, name, price, goodsId),
                         ),
                       );
                       temp.add(content);

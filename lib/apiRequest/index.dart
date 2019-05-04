@@ -378,3 +378,22 @@ withdrawToken(data) async {
     print(e);
   }
 }
+
+getProductDetail(String goodsId) async {
+  var params = {'m': 'goods', 'u': 0, 'id': goodsId};
+  try {
+    Response response = await dio.get(
+      '$storeSite',
+      queryParameters: params,
+      options: Options(
+        extra: {'store': true},
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      )
+    );
+    return response.data;
+  } catch (e) {
+    print(e.error);
+  }
+}
