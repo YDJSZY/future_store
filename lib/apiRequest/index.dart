@@ -397,3 +397,44 @@ getProductDetail(String goodsId) async {
     print(e.error);
   }
 }
+
+getShoppingCart() async {
+  var params = {'m': 'cart'};
+  try {
+    Response response = await dio.get(
+      '$storeSite',
+      queryParameters: params,
+      options: Options(
+        extra: {'store': true},
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      )
+    );
+    return response.data;
+  } catch (e) {
+    print(e.error);
+  }
+}
+
+addShoppingCart(data) async{
+  print(data);
+  FormData formData = new FormData.from({
+    'goods': data,
+  });
+  try {
+    Response response = await dio.post(
+      '$storeSite?m=cart&a=add_to_cart',
+      data: formData,
+      options: Options(
+        extra: {'store': true},
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      )
+    );
+    return response.data;
+  } catch (e) {
+    print(e.toString());
+  }
+}

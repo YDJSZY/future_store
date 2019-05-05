@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import '../../apiRequest/index.dart';
 import 'dart:convert';
+import 'package:flutter_html/flutter_html.dart';
+import '../../components/toast/index.dart';
 
 class ProductDetail extends StatefulWidget {
   final String goodsId;
@@ -16,17 +18,51 @@ class ProductDetail extends StatefulWidget {
 
 class _ProductDetail extends State<ProductDetail> {
   Map productDetail = {};
+  int cartCount = 0;
 
   @override
   void initState() {
     super.initState();
+    instantiateShowToast();
     _getProductDetail();
+    _getShoppingCart();
   }
+
   _getProductDetail() async {
     var res = await getProductDetail(widget.goodsId);
     setState(() {
       productDetail = json.decode(res);
     });
+  }
+
+  _getShoppingCart() async {
+    var res = await getShoppingCart();
+    print(res);
+    setState(() {
+      cartCount = res['total']['cart_goods_number'];
+    });
+  }
+
+  addCart(language) async{
+    if (productDetail['goods']['goods_number'] == 0) {
+      return showToast.error(language['understock']);
+    }
+    var data = {
+      'goods_id': widget.goodsId,
+      'number': 1,
+      'store_id': 0,
+      'parent': 0
+    };
+    var res = await addShoppingCart(json.encode(data));
+    res = json.decode(res);
+    if (res['error'] == 0) {
+      showToast.success(language['added_successfully']);
+      setState(() {
+        cartCount = res['goods_number'];
+      });
+    } else if (res['error'] == 2) {
+      showToast.error(language['understock']);
+    }
   }
 
   Widget buildProductImg() {
@@ -168,6 +204,28 @@ class _ProductDetail extends State<ProductDetail> {
     );
   }
 
+  buildProductDetail(language) {
+    return Column(
+      children: <Widget>[
+        Container(
+          padding: EdgeInsets.only(top: 14, bottom: 14),
+          alignment: Alignment.center,
+          color: Color(0xFFF3F4F6),
+          child: Text(language['detail_introduce'], style: TextStyle(color: Color(0xFF313131), fontSize: 13),),
+        ),
+        Html(
+          data: productDetail['goods_desc']
+        ),
+        Container(
+          padding: EdgeInsets.only(top: 14, bottom: 14),
+          alignment: Alignment.center,
+          color: Color(0xFFF3F4F6),
+          child: Text(language['Its_over'], style: TextStyle(color: Color(0xFF313131), fontSize: 13),),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return new StoreConnector<dynamic, Map>(
@@ -194,8 +252,64 @@ class _ProductDetail extends State<ProductDetail> {
                   buildExpress(language),
                   buildProductEvaluation(language),
                   buildStoreInfo(language),
+                  buildProductDetail(language)
                 ],
               )
+            )
+          ),
+          bottomNavigationBar: BottomAppBar(
+            child: Container(
+              height: 56,
+              padding: EdgeInsets.only(left: 16, right: 16),
+              color: Colors.white,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Stack(
+                    overflow: Overflow.visible,
+                    children: <Widget>[
+                      Positioned(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(
+                              IconData(
+                                0xe6b5, 
+                                fontFamily: 'iconfont'
+                              ),
+                              color: Color(0xFF535353),
+                              size: 22,
+                            ),
+                            Text(language['shopping_cart'], style: TextStyle(color: Color(0xFF535353), fontSize: 10))
+                          ],
+                        ),
+                      ),
+                      Positioned(
+                        left: 13,
+                        top: 2,
+                        child: Container(
+                          width: 20,
+                          height: 20,
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFF85721),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(cartCount.toString(), style: TextStyle(color: Colors.white, fontSize: 10)),
+                        ),
+                      )
+                    ],
+                  ),
+                  FlatButton(
+                    onPressed: () => addCart(language),
+                    padding: EdgeInsets.only(top: 11, bottom: 11, left: 28, right: 28),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
+                    color: Color(0xFFF8AE33),
+                    child: Text(language['add_cart'], style: TextStyle(color: Colors.white, fontSize: 15)),
+                  )
+                ],
+              ),
             )
           )
         );
