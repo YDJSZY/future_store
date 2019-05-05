@@ -24,14 +24,22 @@ class _ProductDetail extends State<ProductDetail> {
   }
   _getProductDetail() async {
     var res = await getProductDetail(widget.goodsId);
-    print(res is String);
     setState(() {
       productDetail = json.decode(res);
     });
   }
 
   Widget buildProductImg() {
-    return Image.network(productDetail['goods']['goods_img'], height: 375,);
+    return Container(
+      width: double.infinity,
+      height: 375,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: NetworkImage(productDetail['goods']['goods_img']),
+          fit: BoxFit.cover
+        )
+      )
+    );
   }
 
   Widget buildProductDesc(language) {

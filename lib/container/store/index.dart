@@ -30,7 +30,7 @@ class _Store extends State<Store> {
     var dataList = json.decode(res['view']['data']);
     var slideData = dataList.where((item) => item['module'] == 'slide').toList();
     var productData = dataList.where((item) => item['module'] == 'product').toList();
-    _getRecommendProduct(productData);
+    //_getRecommendProduct(productData);
     _getEcommerceData(productData);
     setState(() {
       slideList = slideData[0]['data']['list']; // 轮播图数据
@@ -174,6 +174,13 @@ class _Store extends State<Store> {
         );
         contentList.add(row);
         rowChildren = [];
+      }
+      if (i == len - 1) {
+        var row = Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: rowChildren,
+        );
+        contentList.add(row);
       }
     }
     return contentList;
