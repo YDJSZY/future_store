@@ -13,6 +13,7 @@ class ShoppingCart extends StatefulWidget {
 class _ShoppingCart extends State<ShoppingCart> {
   bool isDeleteHandle = false;
   int totalCount;
+  num totalPay = 0;
   List shoppingCartList = [];
 
   @override
@@ -51,13 +52,43 @@ class _ShoppingCart extends State<ShoppingCart> {
     });
   }
 
-  selectAllStore(data) {
-    print(data);
+  selectAllStore(isSelect, index) {
+    if (isSelect == null || !isSelect) {
+      shoppingCartList[index]['_isSelect'] = true;
+      shoppingCartList = allSelectStoreChild(true, index);
+    } else {
+      shoppingCartList[index]['_isSelect'] = false;
+      shoppingCartList = allSelectStoreChild(false, index);
+    }
+    setState(() {
+      shoppingCartList = shoppingCartList;
+    });
     return true;
   }
 
+  allSelectStoreChild(isSelect, index) {
+    shoppingCartList[index]['goods_list'].forEach((item) {
+      item['_isSelect'] = isSelect;
+    });
+    return shoppingCartList;
+  }
+
+  singleSelectStoreChild(isSelect, index, parentIndex) {
+    shoppingCartList[parentIndex]['goods_list'][index]['_isSelect'] = !isSelect;
+    var _data = shoppingCartList[parentIndex]['goods_list'].where((item) => item['_isSelect'] == true).toList();
+    shoppingCartList[parentIndex]['_isSelect'] = _data.length == shoppingCartList[parentIndex]['goods_list'].length;
+    setState(() {
+      shoppingCartList = shoppingCartList;
+    });
+  }
+
+  getStoreSelectStatus(data) {
+    var _data = data['goods_list'].where((item) => item['_isSelect'] == true).toList();
+    return _data.length == data['goods_list'].length;
+  }
+
   Widget buildCartItemHeader(data, index) {
-    var _isSelect = data['_isSelect'] == null ? false : data['_isSelect'];
+    var _isSelect = getStoreSelectStatus(data);
     return Container(
       padding: EdgeInsets.only(left: 12, top: 16, bottom: 16),
       decoration: BoxDecoration(
@@ -66,7 +97,7 @@ class _ShoppingCart extends State<ShoppingCart> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          CustomCheckBox(_isSelect, () => selectAllStore(data)),
+          CustomCheckBox(_isSelect, () => selectAllStore(_isSelect, index)),
           Padding(
             padding: EdgeInsets.only(left: 9),
             child: Text(data['ru_name'], style: TextStyle(color: Color(0xFF26262E), fontSize: 15)),
@@ -81,12 +112,37 @@ class _ShoppingCart extends State<ShoppingCart> {
     int len = data.length;
     for (var i = 0; i < len; i++) {
       var goods = data[i];
+      var goodsThumb = goods['goods_thumb'];
+      var goodsName = goods['goods_name'];
+      var goodsPrice = goods['goods_price'];
       var _isSelect = goods['_isSelect'] == null ? false : goods['_isSelect'];
       var container = Container(
+        margin: EdgeInsets.only(bottom: 15),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            CustomCheckBox(_isSelect, () {})
+            CustomCheckBox(_isSelect, () { singleSelectStoreChild(_isSelect, i, index); }),
+            Padding(
+              padding: EdgeInsets.only(left: 5, right: 12),
+              child: Image.network(goodsThumb, width: 80, height: 80),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(top: 2, bottom: 10),
+                    child: Text(goodsName, style: TextStyle(color: Color(0xFF3B3C40), fontSize: 13), overflow: TextOverflow.ellipsis, maxLines: 2)
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Text('PPTR $goodsPrice', style: TextStyle(color: Color(0xFFE60012), fontSize: 13), overflow: TextOverflow.ellipsis, maxLines: 1)
+                    ],
+                  )
+                ],
+              ),
+            )
           ],
         ),
       );
@@ -169,6 +225,45 @@ class _ShoppingCart extends State<ShoppingCart> {
               ),
             ),
           ),
+          bottomNavigationBar: BottomAppBar(
+            child: Container(
+              height: 50,
+              color: Colors.white,
+              padding: EdgeInsets.only(left: 16, right: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    child: Row(
+                      children: <Widget>[
+                        CustomCheckBox(false, () {}),
+                        Padding(
+                          padding: EdgeInsets.only(left: 3),
+                          child: Text(language['check_all'], style: TextStyle(color: Color(0xFF26262E), fontSize: 13)),
+                        )
+                      ],
+                    ),
+                  ),
+                  isDeleteHandle ? Container(): Text('${language['total_price']}：$totalPay PPTR', style: TextStyle(color: Color(0xFF26262E), fontSize: 13)),
+                  isDeleteHandle ?
+                  FlatButton(
+                    onPressed: () {},
+                    padding: EdgeInsets.only(top: 8, bottom: 8, left: 28, right: 28),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
+                    color: Color(0xFFF85721),
+                    child: Text(language['delete'], style: TextStyle(color: Colors.white, fontSize: 15)),
+                  ) :
+                  FlatButton(
+                    onPressed: () {},
+                    padding: EdgeInsets.only(top: 8, bottom: 8, left: 28, right: 28),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
+                    color: Color(0xFF70A6FF),
+                    child: Text(language['go_to_settlement'], style: TextStyle(color: Colors.white, fontSize: 15)),
+                  )
+                ],
+              ),
+            ),
+          )
         );
       }
     );
