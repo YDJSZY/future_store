@@ -3,6 +3,7 @@ import 'pages/account/login/index.dart';
 import 'container/index.dart';
 import 'pages/setting/index.dart';
 import 'pages/recharge/index.dart';
+import 'pages/shoppingCart/index.dart';
 
 authenticationRoute(RouteSettings settings, bool isLogin) {
   switch (settings.name) {
@@ -13,8 +14,10 @@ authenticationRoute(RouteSettings settings, bool isLogin) {
       return _authenticationLogin(isLogin, Recharge());
 
     case '/setting':
-      print('setting!!!');
       return _authenticationLogin(isLogin, Setting());
+
+    case '/shoppingCart':
+      return _authenticationLogin(isLogin, ShoppingCart());
       
     case '/login':
       return MaterialPageRoute(builder: (_) {

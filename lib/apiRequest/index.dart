@@ -398,7 +398,7 @@ getProductDetail(String goodsId) async {
   }
 }
 
-getShoppingCart() async {
+getShoppingCart() async { // 购物车
   var params = {'m': 'cart'};
   try {
     Response response = await dio.get(
@@ -417,8 +417,7 @@ getShoppingCart() async {
   }
 }
 
-addShoppingCart(data) async{
-  print(data);
+addShoppingCart(data) async {
   FormData formData = new FormData.from({
     'goods': data,
   });

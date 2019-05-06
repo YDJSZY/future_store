@@ -4,6 +4,7 @@ import '../../apiRequest/index.dart';
 import 'dart:convert';
 import 'package:flutter_html/flutter_html.dart';
 import '../../components/toast/index.dart';
+import '../../components/backToTop/index.dart';
 
 class ProductDetail extends StatefulWidget {
   final String goodsId;
@@ -19,6 +20,7 @@ class ProductDetail extends StatefulWidget {
 class _ProductDetail extends State<ProductDetail> {
   Map productDetail = {};
   int cartCount = 0;
+  ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -37,13 +39,13 @@ class _ProductDetail extends State<ProductDetail> {
 
   _getShoppingCart() async {
     var res = await getShoppingCart();
-    print(res);
     setState(() {
       cartCount = res['total']['cart_goods_number'];
     });
   }
 
   addCart(language) async{
+    if (productDetail['goods'] == null) return null;
     if (productDetail['goods']['goods_number'] == 0) {
       return showToast.error(language['understock']);
     }
@@ -72,7 +74,7 @@ class _ProductDetail extends State<ProductDetail> {
       decoration: BoxDecoration(
         image: DecorationImage(
           image: NetworkImage(productDetail['goods']['goods_img']),
-          fit: BoxFit.cover
+          fit: BoxFit.fill
         )
       )
     );
@@ -244,6 +246,7 @@ class _ProductDetail extends State<ProductDetail> {
           body: Container(
             color: Color(0xFFEEEEEE),
             child: SingleChildScrollView(
+              controller: _scrollController,
               child: productDetail['goods'] == null
                 ? Container() : Column(
                 children: <Widget>[
@@ -311,6 +314,14 @@ class _ProductDetail extends State<ProductDetail> {
                 ],
               ),
             )
+          ),
+          floatingActionButton: FloatingActionButton(
+            foregroundColor: Colors.transparent,
+            backgroundColor: Colors.transparent,
+            elevation: 0, // 未点击时阴影值
+            highlightElevation: 0,
+            onPressed: () {},
+            child: BackToTop(_scrollController),
           )
         );
       }

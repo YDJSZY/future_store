@@ -22,6 +22,7 @@ AppState mainReducer(AppState state, dynamic action) {
       return state;
 
     case Actions.SetStoreUserInfo:
+      globalPrefs.setString('storeUserInfo', json.encode(action['data']));
       state.storeUserInfo.infos = action['data'];
       return state;
 

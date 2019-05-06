@@ -24,7 +24,6 @@ class _Login extends State<Login> {
     super.initState();
     globalState.dispatch({'type': Actions.Logout});
     instantiateShowToast();
-    print('Login');
   }
 
   void login(setUserInfo, language) async {
@@ -38,7 +37,6 @@ class _Login extends State<Login> {
     }
     if (res['ticLogin']['success'] && res['storeLogin']['result'] == 'success') {
       setUserInfo(res['ticLogin']['data'], res['storeLogin']['info'], res['wallet']);
-      print('9999');
       Navigator.of(context).pushReplacementNamed('/');
       return null;
     }

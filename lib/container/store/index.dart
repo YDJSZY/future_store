@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter_redux/flutter_redux.dart';
 import '../../apiRequest/index.dart';
 import '../../pages/productDetail/index.dart';
+import '../../components/backToTop/index.dart';
 
 class Store extends StatefulWidget {
   @override
@@ -17,6 +18,7 @@ class _Store extends State<Store> {
   List category = [];
   List recommendProduct = [];
   List ecommerceData = [];
+  ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -86,6 +88,10 @@ class _Store extends State<Store> {
       context,
       new MaterialPageRoute(builder: (context) => ProductDetail(goodsId))
     );
+  }
+
+  gotoShoppingCart() {
+    Navigator.of(context).pushNamed('/shoppingCart');
   }
 
   Widget buildSearch(Map language) {
@@ -335,6 +341,7 @@ class _Store extends State<Store> {
           body: Container(
             color: Color(0xFFEEEEEE),
             child: SingleChildScrollView(
+              controller: _scrollController,
               child: Column(
                 children: <Widget>[
                   buildSearch(language),
@@ -344,6 +351,31 @@ class _Store extends State<Store> {
                 ],
               ),
             )
+          ),
+          floatingActionButton: Container(
+            height: 100,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(bottom: 5),
+                  child: BackToTop(_scrollController)
+                ),
+                GestureDetector(
+                  onTap: gotoShoppingCart,
+                  behavior: HitTestBehavior.translucent,
+                  child: new Icon( 
+                    IconData(
+                      0xe6b4, 
+                      fontFamily: 'iconfont'
+                    ),
+                    color: Color(0xFF70A6FF),
+                    size: 44,
+                  ),
+                )
+              ],
+            ),
           )
         );
       },

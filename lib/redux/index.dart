@@ -9,6 +9,7 @@ var globalState;
 
 stateInit () async {
   var userInfo = globalPrefs.getString('userInfo');
+  var storeUserInfo = globalPrefs.getString('storeUserInfo');
   var locale = globalPrefs.getString('locale');
   var pricingType = globalPrefs.getString('pricingType');
   var wallet = globalPrefs.getString('wallet');
@@ -16,7 +17,7 @@ stateInit () async {
 
   globalState = Store<AppState>(mainReducer, initialState: AppState(
     myInfo: MyInfo(userInfo == null ? {} : json.decode(userInfo), wallet == null ? {} : json.decode(wallet)), //string to map,
-    storeUserInfo: StoreUserInfo({}),
+    storeUserInfo: StoreUserInfo(storeUserInfo == null ? {} : json.decode(storeUserInfo)),
     language: Language(language[locale == null ? 'zh_CN': locale]),
     pricingType: PricingType(pricingType == null ? 'CNY' : pricingType),
     locale: Locale(locale == null ? 'zh_CN' : locale)
