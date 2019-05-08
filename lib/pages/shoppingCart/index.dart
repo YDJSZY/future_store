@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'dart:convert';
 import '../../apiRequest/index.dart';
 import '../../components/checkBox/index.dart';
+import '../../components/toast/index.dart';
 
 class ShoppingCart extends StatefulWidget {
   @override
@@ -18,6 +20,7 @@ class _ShoppingCart extends State<ShoppingCart> {
   @override
   void initState() {
     super.initState();
+    instantiateShowToast();
     _getShoppingCart();
   }
 
@@ -29,6 +32,29 @@ class _ShoppingCart extends State<ShoppingCart> {
       shoppingCartData = res;
       totalCount = res['total']['real_goods_count'];
     });
+  }
+
+  delete(Map language) async {
+    List idList = getIsSelectId();
+    if (idList.length == 0) return showToast.error(language['no_select_product']);
+    var res = await deleteShopCartProduct(idList);
+    if (json.decode(res)['error'] == 0) {
+      showToast.success(language['delete_success']);
+      return _getShoppingCart();
+    }
+    showToast.error(language['delete_fail']);
+  }
+
+  getIsSelectId() {
+    List idList = [];
+    shoppingCartData['goods_list'].forEach((item) {
+      item['goods_list'].forEach((goods) {
+        if (goods['_isSelect'] == true) {
+          idList.add(goods['rec_id']);
+        }
+      });
+    });
+    return idList;
   }
 
   translateGoodsList(data) {
@@ -293,7 +319,7 @@ class _ShoppingCart extends State<ShoppingCart> {
                   isDeleteHandle ? Container(): Text('${language['total_price']}：$totalPay PPTR', style: TextStyle(color: Color(0xFF26262E), fontSize: 13)),
                   isDeleteHandle ?
                   FlatButton(
-                    onPressed: () {},
+                    onPressed: () => delete(language),
                     padding: EdgeInsets.only(top: 8, bottom: 8, left: 28, right: 28),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
                     color: Color(0xFFF85721),

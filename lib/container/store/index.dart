@@ -13,12 +13,15 @@ class Store extends StatefulWidget {
   }
 }
 
-class _Store extends State<Store> {
+class _Store extends State<Store> with AutomaticKeepAliveClientMixin {
   List slideList = [];
   List category = [];
   List recommendProduct = [];
   List ecommerceData = [];
   ScrollController _scrollController = ScrollController();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -334,6 +337,7 @@ class _Store extends State<Store> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return new StoreConnector<dynamic, Map>(
       converter: (store) => store.state.language.data,//转换从redux拿回来的值
       builder: (context, language) {

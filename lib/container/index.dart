@@ -12,15 +12,18 @@ class FutureStore extends StatefulWidget {
 
 class _FutureStore extends State<FutureStore> {
   int _currentIndex = 0;
+  PageController _pageController;
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: _currentIndex, keepPage: true);
   }
 
   setCurrentPageIndex(index) {
     setState(() {
       _currentIndex = index;
+      _pageController.jumpToPage(index);
     });
   }
 
@@ -31,7 +34,11 @@ class _FutureStore extends State<FutureStore> {
         builder: (context, id) {
           return id == null ? Login() :
             Scaffold(
-              body: containerList[_currentIndex],
+              body: PageView(
+                children: containerList,
+                controller: _pageController,
+                physics: NeverScrollableScrollPhysics(), // 禁止左右切换
+              ),
               bottomNavigationBar: BottomNavigationBar(
                 backgroundColor: Color(0xFF1F1F1F),
                 currentIndex: _currentIndex,

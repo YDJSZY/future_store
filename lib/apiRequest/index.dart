@@ -437,3 +437,24 @@ addShoppingCart(data) async {
     print(e.toString());
   }
 }
+
+deleteShopCartProduct(List idList) async { // 删除购物车
+  FormData formData = new FormData.from({
+    'id': idList.join(',') + ',',
+  });
+  try {
+    Response response = await dio.post(
+      '$storeSite?m=cart&a=drop_goods',
+      data: formData,
+      options: Options(
+        extra: {'store': true},
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      )
+    );
+    return response.data;
+  } catch (e) {
+    print(e.toString());
+  }
+}
